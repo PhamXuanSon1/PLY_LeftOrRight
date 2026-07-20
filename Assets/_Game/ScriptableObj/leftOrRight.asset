@@ -46,19 +46,19 @@ MonoBehaviour:
     slotName: hair1-back Hair
     attachmentName: hair1/back Hair
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     slotName: leg_L
     attachmentName: leg_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     slotName: leg_R
     attachmentName: leg_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     slotName: thigh_L
     attachmentName: thigh_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     slotName: thigh_R
     attachmentName: thigh_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
@@ -270,7 +270,7 @@ MonoBehaviour:
     slotName: arm_L
     attachmentName: arm_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     slotName: arm_R
     attachmentName: arm_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}

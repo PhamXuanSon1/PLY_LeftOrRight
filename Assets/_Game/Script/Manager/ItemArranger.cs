@@ -81,10 +81,7 @@ public class ItemArranger : MonoBehaviour
         if (scrollbar != null && scrollbar.gameObject.activeInHierarchy && scrollbar.normalizedValue != lastScrollValue)
         {
             shouldUpdate = true;
-            if (HandHintManager.Instance != null)
-            {
-                HandHintManager.Instance.ShowHintWithDelay(); // Reset Hand Hint
-            }
+
         }
 
         // Kiểm tra xem số lượng item đang bật có thay đổi không (bị tắt đi/xóa đi)
@@ -217,12 +214,7 @@ public class ItemArranger : MonoBehaviour
             {
                 itemsToArrange[i].itemTransform.position = new Vector3(currentX, targetY, itemsToArrange[i].itemTransform.position.z);
                 
-                // Cập nhật lại vị trí SpawnPos để HandHint và thả rơi không bị sai
-                DrawItemMovement movement = itemsToArrange[i].itemTransform.GetComponent<DrawItemMovement>();
-                if (movement != null)
-                {
-                    movement.UpdateSpawnPos();
-                }
+
 
                 // Cộng khoảng cách chuẩn bị cho item tiếp theo
                 currentX += itemsToArrange[i].spacingToNext;
