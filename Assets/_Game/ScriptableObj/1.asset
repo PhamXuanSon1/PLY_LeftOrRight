@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 835b57c76fadf464f809411add1fd104, type: 3}
-  m_Name: leftOrRight
+  m_Name: 1
   m_EditorClassIdentifier: 
   targetSkeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   equipmentSet:
@@ -46,19 +46,19 @@ MonoBehaviour:
     slotName: hair1-back Hair
     attachmentName: hair1/back Hair
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: leg_L
     attachmentName: leg_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: leg_R
     attachmentName: leg_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: thigh_L
     attachmentName: thigh_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: thigh_R
     attachmentName: thigh_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
@@ -234,11 +234,11 @@ MonoBehaviour:
     slotName: skirt2-thigh_R
     attachmentName: 
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: forearm_L
     attachmentName: forearm_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: forearm_R
     attachmentName: forearm_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
@@ -266,33 +266,33 @@ MonoBehaviour:
     slotName: shirt6-forearm_R
     attachmentName: shirt6/forearm_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: arm_L
     attachmentName: arm_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: arm_R
     attachmentName: arm_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_R
-    attachmentName: 
+    attachmentName: hand_up_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_L
-    attachmentName: 
+    attachmentName: hand_up_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: hand_L
     attachmentName: hand_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: hand_R
     attachmentName: hand_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_heart
-    attachmentName: 
+    attachmentName: hand_heart
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: black-hand_heart
@@ -300,59 +300,59 @@ MonoBehaviour:
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: heart_hand_L
-    attachmentName: 
+    attachmentName: heart_hand_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: heart_hand_R
-    attachmentName: 
+    attachmentName: heart_hand_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: spread_hand_L
-    attachmentName: 
+    attachmentName: spread_hand_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: spread_hand_R
-    attachmentName: 
+    attachmentName: spread_hand_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_R1
-    attachmentName: 
+    attachmentName: hand_up_R1
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_R3
-    attachmentName: 
+    attachmentName: hand_up_R3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_R5
-    attachmentName: 
+    attachmentName: hand_up_R3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_R4
-    attachmentName: 
+    attachmentName: hand_up_R4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_L1
-    attachmentName: 
+    attachmentName: hand_up_R1
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_L2
-    attachmentName: 
+    attachmentName: hand_up_R1
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_L4
-    attachmentName: 
+    attachmentName: hand_up_L4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand_up_L5
-    attachmentName: 
+    attachmentName: hand_up_L5
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: say_hi_L
-    attachmentName: 
+    attachmentName: say_hi_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: say_hi_R
-    attachmentName: 
+    attachmentName: say_hi_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: shirt1-arm_L
@@ -378,7 +378,7 @@ MonoBehaviour:
     slotName: forearm_L_front
     attachmentName: 
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: hip
     attachmentName: hip
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
@@ -394,7 +394,7 @@ MonoBehaviour:
     slotName: skirt_black4-skirt
     attachmentName: skirt
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: shirt
     attachmentName: shirt
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
@@ -412,13 +412,13 @@ MonoBehaviour:
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hand 1
-    attachmentName: 
+    attachmentName: hand 1
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: head
     attachmentName: head
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: face
     attachmentName: face
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
@@ -434,7 +434,7 @@ MonoBehaviour:
     slotName: hair
     attachmentName: hair
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: front_Hair
     attachmentName: front_Hair
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
@@ -494,7 +494,7 @@ MonoBehaviour:
     slotName: acc_rw_ad_cat_blue-hat
     attachmentName: hat
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     slotName: acc_rw_ad3-hat
     attachmentName: hat
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Spine.Unity;
 #if UNITY_EDITOR
 using Sirenix.OdinInspector;
 using Spine;
@@ -103,17 +104,14 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Mặc đồ cho nhân vật bằng hệ thống Mix Skin.
+    /// Quét bảng SlotAttachmentPair, tìm các Skin chứa attachment tương ứng, gộp lại và đắp lên nhân vật.
+    /// </summary>
     public void EquipCharacter(Character character, EquipmentSetData equipmentData)
     {
         if (character == null || equipmentData == null) return;
-
-        for(int i = 0; i < equipmentData.equipmentSet.Count; i++)
-        {
-            SlotAttachmentPair pair = equipmentData.equipmentSet[i];
-            string attachName = pair.isEnabled ? pair.attachmentName : null;
-            // Debug.Log(attachName);
-            character.TurnSlotAttachment(pair.slotName, attachName);
-        }
+        character.EquipFromSlotAttachmentPairs(equipmentData.equipmentSet);
     }
 
     // Mặc đồ từ thông tin của ItemController (Hỗ trợ Item có nhiều part/slot)
@@ -173,45 +171,67 @@ public class CharacterManager : MonoBehaviour
         myEquipmentSet.Clear();
 
         Skeleton skeleton = targetTestCharacter.SkeletonAnimation.Skeleton;
-        Skin defaultSkin = skeleton.Data.DefaultSkin;
-        Skin currentSkin = skeleton.Skin;
+        SkeletonData skeletonData = skeleton.Data;
+        Skin defaultSkin = skeletonData.DefaultSkin;
 
+        // Quét TẤT CẢ các Skin (bao gồm Default + Named Skins) để tìm Placeholder Name cho mỗi Slot
         for (int i = 0; i < skeleton.Slots.Count; i++)
         {
             Slot slot = skeleton.Slots.Items[i];
             string finalAttachmentName = null;
+            bool foundInAnySkin = false;
 
+            // Tìm attachment name (Skin Placeholder) từ TẤT CẢ các skin
+            for (int s = 0; s < skeletonData.Skins.Count; s++)
+            {
+                Skin skin = skeletonData.Skins.Items[s];
+                List<Skin.SkinEntry> entries = new List<Skin.SkinEntry>();
+                skin.GetAttachments(i, entries);
+
+                if (entries.Count > 0)
+                {
+                    finalAttachmentName = entries[0].Name; // Tên Skin Placeholder
+                    foundInAnySkin = true;
+                    break;
+                }
+            }
+
+            // Fallback: dùng Setup Pose attachment name
+            if (!foundInAnySkin)
+            {
+                finalAttachmentName = slot.Data.AttachmentName;
+            }
+
+            // Kiểm tra isEnabled:
+            // Nếu bạn muốn lấy đúng những gì đang hiện trên Scene (kể cả khi không Play game)
+            // thì ta phải kiểm tra xem slot.Attachment có thực sự khác null không (đang có hình ảnh đắp lên).
+            bool shouldEnable = false;
+            
+            // Lấy attachment hiện tại đang gắn vào slot (chính xác những gì đang vẽ trên màn hình)
             if (slot.Attachment != null)
             {
-                finalAttachmentName = slot.Attachment.Name;
-            }
-            else
-            {
-                // Tìm attachment name đầu tiên trong skin
-                List<Skin.SkinEntry> slotAttachments = new List<Skin.SkinEntry>();
-                if (defaultSkin != null)
+                // Nếu slot đang có đồ, và đồ đó khớp với tên placeholder hoặc chứa chữ của placeholder
+                if (!string.IsNullOrEmpty(finalAttachmentName) && 
+                   (slot.Attachment.Name.Contains(finalAttachmentName) || finalAttachmentName.Contains(slot.Attachment.Name)))
                 {
-                    defaultSkin.GetAttachments(i, slotAttachments);
-                }
-                
-                if (slotAttachments.Count == 0 && currentSkin != null)
-                {
-                    currentSkin.GetAttachments(i, slotAttachments);
-                }
-
-                if (slotAttachments.Count > 0)
-                {
-                    finalAttachmentName = slotAttachments[0].Name;
+                    shouldEnable = true;
                 }
                 else
                 {
-                    finalAttachmentName = slot.Data.AttachmentName;
+                    shouldEnable = true; // Cứ có đồ hiển thị là bật
                 }
             }
+            else if (!string.IsNullOrEmpty(slot.Data.AttachmentName))
+            {
+                // Hoặc nếu nó là đồ mặc định của Setup Pose (bạn muốn bật mặc định)
+                shouldEnable = true;
+            }
+
+            Debug.Log($"Slot: {slot.Data.Name} | Hiện trên Scene (slot.Attachment): {(slot.Attachment != null ? slot.Attachment.Name : "NULL")} | Setup Pose: {slot.Data.AttachmentName ?? "NULL"} | => TICK: {shouldEnable}");
 
             myEquipmentSet.Add(new SlotAttachmentPair
             {
-                isEnabled = slot.Attachment != null,
+                isEnabled = shouldEnable,
                 slotName = slot.Data.Name,
                 attachmentName = finalAttachmentName,
                 skeletonDataAsset = targetTestCharacter.SkeletonAnimation.SkeletonDataAsset
@@ -297,17 +317,7 @@ public class CharacterManager : MonoBehaviour
     {
         if (myEquipmentSet == null || targetTestCharacter == null) return;
         
-        for (int i = 0; i < myEquipmentSet.Count; i++)
-        {
-            var pair = myEquipmentSet[i];
-            string attachName = string.IsNullOrEmpty(pair.attachmentName) ? null : pair.attachmentName;
-            targetTestCharacter.TurnSlotAttachment(pair.slotName, pair.isEnabled ? attachName : null);
-        }
-
-        if (!Application.isPlaying && targetTestCharacter.SkeletonAnimation != null)
-        {
-            targetTestCharacter.SkeletonAnimation.LateUpdate();
-        }
+        targetTestCharacter.EquipFromSlotAttachmentPairs(myEquipmentSet);
     }
 
     [Button("Tắt Tất Cả Đồ (Chỉ Target)", ButtonSizes.Medium)]
@@ -319,9 +329,11 @@ public class CharacterManager : MonoBehaviour
         for (int i = 0; i < myEquipmentSet.Count; i++)
         {
             var pair = myEquipmentSet[i];
-            pair.isEnabled = false; // Tắt luôn dấu tick trên Inspector
-            targetTestCharacter.TurnSlotAttachment(pair.slotName, null); // Tắt trên Spine
+            pair.isEnabled = false;
         }
+        
+        // Đắp lại skin rỗng (chỉ có Default Skin)
+        targetTestCharacter.EquipFromSlotAttachmentPairs(myEquipmentSet);
     }
 
 #endif

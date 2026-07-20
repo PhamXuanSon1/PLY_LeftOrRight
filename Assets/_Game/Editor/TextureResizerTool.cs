@@ -7,6 +7,8 @@ public class TextureResizerTool : EditorWindow
     private int targetWidth = 512;
     private int targetHeight = 512;
     private float scaleFactor = 0.5f;
+    private bool keepAspectRatio = true;
+    private bool useWidthAsBase = true;
 
     [MenuItem("Tools/Texture Resizer")]
     public static void ShowWindow()
@@ -36,15 +38,52 @@ public class TextureResizerTool : EditorWindow
 
         // --- 1. Thay đổi theo kích thước cố định ---
         GUILayout.Label("1. Thay đổi theo kích thước tuỳ chỉnh:", EditorStyles.boldLabel);
-        EditorGUILayout.BeginHorizontal();
-        targetWidth = EditorGUILayout.IntField("Width", targetWidth);
-        targetHeight = EditorGUILayout.IntField("Height", targetHeight);
-        EditorGUILayout.EndHorizontal();
+        
+        keepAspectRatio = EditorGUILayout.Toggle("Giữ tỷ lệ gốc", keepAspectRatio);
+        
+        if (keepAspectRatio)
+        {
+            useWidthAsBase = EditorGUILayout.Toggle("Dựa theo Width", useWidthAsBase);
+            if (useWidthAsBase)
+            {
+                targetWidth = EditorGUILayout.IntField("Width mong muốn", targetWidth);
+            }
+            else
+            {
+                targetHeight = EditorGUILayout.IntField("Height mong muốn", targetHeight);
+            }
+        }
+        else
+        {
+            EditorGUILayout.BeginHorizontal();
+            targetWidth = EditorGUILayout.IntField("Width", targetWidth);
+            targetHeight = EditorGUILayout.IntField("Height", targetHeight);
+            EditorGUILayout.EndHorizontal();
+        }
 
-        if (GUILayout.Button("Resize theo Width & Height"))
+        if (GUILayout.Button(keepAspectRatio ? "Resize (Giữ tỷ lệ)" : "Resize theo Width & Height"))
         {
             foreach (var tex in selectedTextures)
-                ResizeTexture(tex, targetWidth, targetHeight);
+            {
+                int finalWidth = targetWidth;
+                int finalHeight = targetHeight;
+
+                if (keepAspectRatio)
+                {
+                    if (useWidthAsBase)
+                    {
+                        finalWidth = targetWidth;
+                        finalHeight = Mathf.RoundToInt((float)tex.height / tex.width * targetWidth);
+                    }
+                    else
+                    {
+                        finalHeight = targetHeight;
+                        finalWidth = Mathf.RoundToInt((float)tex.width / tex.height * targetHeight);
+                    }
+                }
+
+                ResizeTexture(tex, finalWidth, finalHeight);
+            }
         }
 
         EditorGUILayout.Space();
