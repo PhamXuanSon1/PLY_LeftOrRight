@@ -96,6 +96,12 @@ public class ProgressTrackingManager : MonoBehaviour
 
     private int GetDynamicMaxScore()
     {
+        // Hiện tại trong project này chưa có UIManager, ItemManager và PlayableFlowMode.
+        // Có vẻ script này được copy từ một project cũ. 
+        // Tạm thời mình comment lại logic động này và chỉ trả về maxScore gốc.
+        // Bạn có thể sửa lại logic lấy tổng số item theo project hiện tại (ví dụ lấy từ SlotManager).
+        
+        /*
         if (UIManager.Instance == null || ItemManager.Instance == null) return maxScore;
 
         PlayableFlowMode mode = UIManager.Instance.flowMode;
@@ -112,15 +118,15 @@ public class ProgressTrackingManager : MonoBehaviour
                 return totalItems;
                 
             case PlayableFlowMode.StoreAfterPhase1_End:
-                // Nếu dừng ở Phase 1 thì max score là tổng số item của Phase 1 hoặc endGameCount
                 return Mathf.Min(phase1Count, endCount);
 
             case PlayableFlowMode.StoreAtLastItem_End:
-                // Trò chơi dừng ngay khi NHẤC item cuối lên, nghĩa là số lượng item 
-                // ĐẶT THÀNH CÔNG (arrived) tối đa sẽ là endGameCount - 1
                 return Mathf.Min(endCount - 1, totalItems - 1);
         }
 
         return totalItems;
+        */
+        
+        return maxScore;
     }
 }
