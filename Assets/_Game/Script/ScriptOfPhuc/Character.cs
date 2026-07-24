@@ -47,7 +47,9 @@ public class Character : Ply_GameUnit
 
     private void OnSkeletonRebuild(SkeletonRenderer renderer)
     {
-        if (currentAppliedPairs == null || currentAppliedPairs.Count == 0) return;
+        bool hasSkins = currentAppliedSkinNames != null && currentAppliedSkinNames.Count > 0;
+        bool hasPairs = currentAppliedPairs != null && currentAppliedPairs.Count > 0;
+        if (!hasSkins && !hasPairs) return;
 
 #if UNITY_EDITOR
         if (!Application.isPlaying)
@@ -58,16 +60,21 @@ public class Character : Ply_GameUnit
             return;
         }
 #endif
-        EquipFromSlotAttachmentPairs(currentAppliedPairs, false);
+        // Gọi thẳng hàm Mix mới với cả 2 danh sách
+        ApplySkinsAndAttachmentsMix(currentAppliedSkinNames, currentAppliedPairs);
     }
 
 #if UNITY_EDITOR
     private void ReapplyInEditor()
     {
         if (this == null || skeletonAnimation == null || skeletonAnimation.Skeleton == null) return;
-        if (currentAppliedPairs == null || currentAppliedPairs.Count == 0) return;
 
-        EquipFromSlotAttachmentPairs(currentAppliedPairs, false);
+        bool hasSkins = currentAppliedSkinNames != null && currentAppliedSkinNames.Count > 0;
+        bool hasPairs = currentAppliedPairs != null && currentAppliedPairs.Count > 0;
+        if (!hasSkins && !hasPairs) return;
+
+        // Gọi thẳng hàm Mix mới với cả 2 danh sách
+        ApplySkinsAndAttachmentsMix(currentAppliedSkinNames, currentAppliedPairs);
 
         // Bắt buộc render lại hình ảnh trong Edit mode
         skeletonAnimation.LateUpdate();
@@ -105,121 +112,123 @@ public class Character : Ply_GameUnit
         }
     }
 
-    // ===== API MỚI: Mix Skin =====
+    // ===== API MỚI: Kết hợp cả Skin và Attachment =====
 
     /// <summary>
-    /// Gộp danh sách các Skin lại với nhau rồi đắp lên nhân vật.
-    /// Đây là hàm chính để thay đồ theo hệ thống Skin mới.
+    /// Gộp cả danh sách Skin và danh sách Attachment lại với nhau.
+    /// Hỗ trợ cả 2 hệ thống cùng lúc (Skin làm nền, Attachment làm chi tiết đè lên).
     /// </summary>
-    public void MixAndApplySkins(List<string> skinNames)
+    public void MixSkinsAndAttachments(List<string> skinNames, List<SlotAttachmentPair> attachmentPairs)
     {
-        // Lưu lại danh sách Skin đang mặc để tự động đắp lại khi Skeleton bị rebuild
-        currentAppliedSkinNames = new List<string>(skinNames);
+        currentAppliedSkinNames = new List<string>(skinNames ?? new List<string>());
+        
+        currentAppliedPairs = new List<SlotAttachmentPair>();
+        if (attachmentPairs != null)
+        {
+            for (int i = 0; i < attachmentPairs.Count; i++)
+            {
+                currentAppliedPairs.Add(new SlotAttachmentPair
+                {
+                    isEnabled = attachmentPairs[i].isEnabled,
+                    slotName = attachmentPairs[i].slotName,
+                    attachmentName = attachmentPairs[i].attachmentName,
+                    skeletonDataAsset = attachmentPairs[i].skeletonDataAsset
+                });
+            }
+        }
 
 #if UNITY_EDITOR
-        // Đánh dấu đối tượng đã bị thay đổi để Unity lưu lại vào Scene
-        if (!Application.isPlaying)
-        {
-            UnityEditor.EditorUtility.SetDirty(this);
-        }
+        if (!Application.isPlaying) UnityEditor.EditorUtility.SetDirty(this);
 #endif
 
-        ApplySkinsMix(skinNames);
+        ApplySkinsAndAttachmentsMix(currentAppliedSkinNames, currentAppliedPairs);
     }
 
-    /// <summary>
-    /// Hàm nội bộ: Thực hiện gộp Skin và đắp lên nhân vật.
-    /// Không lưu lại state (tránh vòng lặp vô hạn khi gọi từ OnRebuild).
-    /// </summary>
-    private void ApplySkinsMix(List<string> skinNames)
+    private void ApplySkinsAndAttachmentsMix(List<string> skinNames, List<SlotAttachmentPair> pairs)
     {
         if (skeletonAnimation == null || skeletonAnimation.Skeleton == null) return;
 
         var skeleton = skeletonAnimation.Skeleton;
         var skeletonData = skeleton.Data;
-
-        // Tạo một Skin tuỳ chỉnh mới
         customSkin = new Skin("custom-mix");
 
-        // Gộp Default Skin vào trước (nền tảng cơ bản của nhân vật)
+        // 1. Gộp Default Skin
         if (skeletonData.DefaultSkin != null)
-        {
             customSkin.AddSkin(skeletonData.DefaultSkin);
-        }
 
-        // Gộp từng Skin mà người dùng đã chọn vào (đè đúng thứ tự)
-        for (int i = 0; i < skinNames.Count; i++)
+        HashSet<string> addedSkinNames = new HashSet<string>();
+
+        // 2. Gộp các Skin từ danh sách tên
+        if (skinNames != null)
         {
-            string skinName = skinNames[i];
-            if (string.IsNullOrEmpty(skinName)) continue;
+            for (int i = 0; i < skinNames.Count; i++)
+            {
+                string skinName = skinNames[i];
+                if (string.IsNullOrEmpty(skinName)) continue;
 
-            Skin foundSkin = skeletonData.FindSkin(skinName);
-            if (foundSkin != null)
-            {
-                customSkin.AddSkin(foundSkin);
-            }
-            else
-            {
-                Debug.LogWarning($"[Character] Không tìm thấy Skin '{skinName}' trong file Spine của {gameObject.name}");
+                Skin foundSkin = skeletonData.FindSkin(skinName);
+                if (foundSkin != null && !addedSkinNames.Contains(foundSkin.Name))
+                {
+                    customSkin.AddSkin(foundSkin);
+                    addedSkinNames.Add(foundSkin.Name);
+                }
             }
         }
 
-        // Đắp Skin lên nhân vật
+        // 3. Quét các Attachment, tìm Skin chứa chúng và gộp vào (nếu chưa có)
+        if (pairs != null)
+        {
+            for (int i = 0; i < pairs.Count; i++)
+            {
+                var pair = pairs[i];
+                if (!pair.isEnabled || string.IsNullOrEmpty(pair.attachmentName)) continue;
+
+                SlotData slotData = skeletonData.FindSlot(pair.slotName);
+                if (slotData == null) continue;
+                int slotIndex = slotData.Index;
+
+                for (int s = 0; s < skeletonData.Skins.Count; s++)
+                {
+                    Skin skin = skeletonData.Skins.Items[s];
+                    Attachment attachment = skin.GetAttachment(slotIndex, pair.attachmentName);
+                    if (attachment != null)
+                    {
+                        if (!addedSkinNames.Contains(skin.Name))
+                        {
+                            customSkin.AddSkin(skin);
+                            addedSkinNames.Add(skin.Name);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 4. Đắp tổng hợp Skin lên nhân vật
         skeleton.SetSkin(customSkin);
         skeleton.SetSlotsToSetupPose();
 
-        // Thông báo cho AnimationState cập nhật lại
+        // 5. Ép bật/tắt chính xác các attachment theo danh sách pairs
+        if (pairs != null)
+        {
+            for (int i = 0; i < pairs.Count; i++)
+            {
+                var pair = pairs[i];
+                if (!string.IsNullOrEmpty(pair.slotName))
+                {
+                    if (pair.isEnabled && !string.IsNullOrEmpty(pair.attachmentName))
+                        skeleton.SetAttachment(pair.slotName, pair.attachmentName);
+                    else
+                        skeleton.SetAttachment(pair.slotName, null);
+                }
+            }
+        }
+
         if (skeletonAnimation.AnimationState != null)
-        {
             skeletonAnimation.AnimationState.Apply(skeleton);
-        }
 
-        // Nếu đang chạy trong Editor (không play), cần gọi LateUpdate để refresh render
         if (!Application.isPlaying)
-        {
             skeletonAnimation.LateUpdate();
-        }
-    }
-
-    /// <summary>
-    /// Thêm 1 Skin vào bộ đồ hiện tại (không xoá đồ cũ).
-    /// Dùng khi bạn muốn thêm 1 món đồ mà không cần reset toàn bộ set.
-    /// </summary>
-    public void AddSkinToCurrentMix(string skinName)
-    {
-        if (skeletonAnimation == null || skeletonAnimation.Skeleton == null) return;
-        if (string.IsNullOrEmpty(skinName)) return;
-
-        var skeleton = skeletonAnimation.Skeleton;
-        var skeletonData = skeleton.Data;
-
-        // Nếu chưa có customSkin, tạo mới từ Skin hiện tại
-        if (customSkin == null)
-        {
-            customSkin = new Skin("custom-mix");
-            if (skeleton.Skin != null)
-                customSkin.AddSkin(skeleton.Skin);
-            else if (skeletonData.DefaultSkin != null)
-                customSkin.AddSkin(skeletonData.DefaultSkin);
-        }
-
-        Skin foundSkin = skeletonData.FindSkin(skinName);
-        if (foundSkin != null)
-        {
-            customSkin.AddSkin(foundSkin);
-            skeleton.SetSkin(customSkin);
-            skeleton.SetSlotsToSetupPose();
-
-            if (skeletonAnimation.AnimationState != null)
-                skeletonAnimation.AnimationState.Apply(skeleton);
-
-            if (!Application.isPlaying)
-                skeletonAnimation.LateUpdate();
-        }
-        else
-        {
-            Debug.LogWarning($"[Character] Không tìm thấy Skin '{skinName}' trong file Spine.");
-        }
     }
 
     // ===== API CHO BẢNG SlotAttachmentPair =====

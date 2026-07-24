@@ -34,7 +34,7 @@ public class CharacterManager : MonoBehaviour
     private Dictionary<Transform, Vector3> originalPositions = new Dictionary<Transform, Vector3>();
 
 #if UNITY_EDITOR
-    [Title("Cấu hình Set Đồ (Test)")]
+    [Title("Cấu hình Set Đồ (Skin-Based)")]
     [Header("Chọn Nhân Vật Để Test")]
     [ValueDropdown("GetCharacterChoices")]
     public Character targetTestCharacter;
@@ -43,9 +43,19 @@ public class CharacterManager : MonoBehaviour
     [InlineEditor]
     public EquipmentSetData testEquipmentDataAsset;
 
-    [TableList]
+    // ===== DANH SÁCH SKIN ĐỂ MIX =====
+    [Title("Danh Sách Skin Đang Chọn (Base)")]
+    [InfoBox("Tick vào các Skin nền tảng bạn muốn mặc cho nhân vật. Có thể chọn nhiều Skin cùng lúc (mix).")]
+    [ListDrawerSettings(ShowFoldout = true)]
     [Searchable]
-    public List<SlotAttachmentPair> myEquipmentSet;
+    public List<SkinToggleEntry> mySkinSet = new List<SkinToggleEntry>();
+
+    // ===== DANH SÁCH ATTACHMENT GHI ĐÈ =====
+    [Title("Danh Sách Attachment Ghi Đè (Overrides)")]
+    [InfoBox("Tick vào các chi tiết bạn muốn ép bật/tắt đè lên các Skin ở trên.")]
+    [ListDrawerSettings(ShowFoldout = true)]
+    [Searchable]
+    public List<SlotAttachmentPair> myEquipmentSet = new List<SlotAttachmentPair>();
 
     private IEnumerable<Character> GetCharacterChoices()
     {
@@ -105,13 +115,12 @@ public class CharacterManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Mặc đồ cho nhân vật bằng hệ thống Mix Skin.
-    /// Quét bảng SlotAttachmentPair, tìm các Skin chứa attachment tương ứng, gộp lại và đắp lên nhân vật.
+    /// Mặc đồ cho nhân vật bằng hệ thống Mix Skin kết hợp Attachment.
     /// </summary>
     public void EquipCharacter(Character character, EquipmentSetData equipmentData)
     {
         if (character == null || equipmentData == null) return;
-        character.EquipFromSlotAttachmentPairs(equipmentData.equipmentSet);
+        character.MixSkinsAndAttachments(equipmentData.skinNames, equipmentData.equipmentSet);
     }
 
     // Mặc đồ từ thông tin của ItemController (Hỗ trợ Item có nhiều part/slot)
@@ -157,9 +166,45 @@ public class CharacterManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    [Button("Lấy Tất Cả Slot Từ Target", ButtonSizes.Large)]
+    // ===== NÚT LẤY TẤT CẢ SKIN TỪ TARGET =====
+    [Button("Lấy Tất Cả Skin Từ Target", ButtonSizes.Large)]
     [GUIColor(0.2f, 0.8f, 0.2f)]
-    public void GetAllSlots()
+    public void GetAllSkins()
+    {
+        if (targetTestCharacter == null || targetTestCharacter.SkeletonAnimation == null)
+        {
+            Debug.LogError("Chưa gán Target Test Character hoặc SkeletonAnimation chưa khởi tạo!");
+            return;
+        }
+
+        var skeletonDataAsset = targetTestCharacter.SkeletonAnimation.SkeletonDataAsset;
+        if (skeletonDataAsset == null) return;
+
+        SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
+        if (skeletonData == null) return;
+
+        if (mySkinSet == null) mySkinSet = new List<SkinToggleEntry>();
+        mySkinSet.Clear();
+
+        for (int s = 0; s < skeletonData.Skins.Count; s++)
+        {
+            Skin skin = skeletonData.Skins.Items[s];
+            if (skin.Name == "default") continue;
+
+            mySkinSet.Add(new SkinToggleEntry
+            {
+                isEnabled = false,
+                skinName = skin.Name,
+                skeletonDataAsset = skeletonDataAsset
+            });
+        }
+
+        Debug.Log($"Đã lấy {mySkinSet.Count} skin từ skeleton.");
+    }
+
+    [Button("Lấy Tất Cả Attachment Từ Target", ButtonSizes.Large)]
+    [GUIColor(0.2f, 0.7f, 0.4f)]
+    public void GetAllAttachments()
     {
         if (targetTestCharacter == null || targetTestCharacter.SkeletonAnimation == null || targetTestCharacter.SkeletonAnimation.Skeleton == null)
         {
@@ -172,16 +217,14 @@ public class CharacterManager : MonoBehaviour
 
         Skeleton skeleton = targetTestCharacter.SkeletonAnimation.Skeleton;
         SkeletonData skeletonData = skeleton.Data;
-        Skin defaultSkin = skeletonData.DefaultSkin;
+        var skeletonDataAsset = targetTestCharacter.SkeletonAnimation.SkeletonDataAsset;
 
-        // Quét TẤT CẢ các Skin (bao gồm Default + Named Skins) để tìm Placeholder Name cho mỗi Slot
         for (int i = 0; i < skeleton.Slots.Count; i++)
         {
             Slot slot = skeleton.Slots.Items[i];
             string finalAttachmentName = null;
             bool foundInAnySkin = false;
 
-            // Tìm attachment name (Skin Placeholder) từ TẤT CẢ các skin
             for (int s = 0; s < skeletonData.Skins.Count; s++)
             {
                 Skin skin = skeletonData.Skins.Items[s];
@@ -190,57 +233,32 @@ public class CharacterManager : MonoBehaviour
 
                 if (entries.Count > 0)
                 {
-                    finalAttachmentName = entries[0].Name; // Tên Skin Placeholder
+                    finalAttachmentName = entries[0].Name;
                     foundInAnySkin = true;
                     break;
                 }
             }
 
-            // Fallback: dùng Setup Pose attachment name
             if (!foundInAnySkin)
             {
                 finalAttachmentName = slot.Data.AttachmentName;
             }
 
-            // Kiểm tra isEnabled:
-            // Nếu bạn muốn lấy đúng những gì đang hiện trên Scene (kể cả khi không Play game)
-            // thì ta phải kiểm tra xem slot.Attachment có thực sự khác null không (đang có hình ảnh đắp lên).
-            bool shouldEnable = false;
-            
-            // Lấy attachment hiện tại đang gắn vào slot (chính xác những gì đang vẽ trên màn hình)
-            if (slot.Attachment != null)
-            {
-                // Nếu slot đang có đồ, và đồ đó khớp với tên placeholder hoặc chứa chữ của placeholder
-                if (!string.IsNullOrEmpty(finalAttachmentName) && 
-                   (slot.Attachment.Name.Contains(finalAttachmentName) || finalAttachmentName.Contains(slot.Attachment.Name)))
-                {
-                    shouldEnable = true;
-                }
-                else
-                {
-                    shouldEnable = true; // Cứ có đồ hiển thị là bật
-                }
-            }
-            else if (!string.IsNullOrEmpty(slot.Data.AttachmentName))
-            {
-                // Hoặc nếu nó là đồ mặc định của Setup Pose (bạn muốn bật mặc định)
-                shouldEnable = true;
-            }
-
-            Debug.Log($"Slot: {slot.Data.Name} | Hiện trên Scene (slot.Attachment): {(slot.Attachment != null ? slot.Attachment.Name : "NULL")} | Setup Pose: {slot.Data.AttachmentName ?? "NULL"} | => TICK: {shouldEnable}");
+            bool shouldEnable = (slot.Attachment != null);
 
             myEquipmentSet.Add(new SlotAttachmentPair
             {
                 isEnabled = shouldEnable,
                 slotName = slot.Data.Name,
                 attachmentName = finalAttachmentName,
-                skeletonDataAsset = targetTestCharacter.SkeletonAnimation.SkeletonDataAsset
+                skeletonDataAsset = skeletonDataAsset
             });
         }
 
-        Debug.Log($"Đã lấy {myEquipmentSet.Count} slot từ skeleton.");
+        Debug.Log($"Đã lấy {myEquipmentSet.Count} attachment từ skeleton.");
     }
 
+    // ===== LƯU / TẢI =====
     [HorizontalGroup("SaveLoad")]
     [Button("Lưu vào Asset", ButtonSizes.Medium)]
     [GUIColor(1f, 0.8f, 0.4f)]
@@ -252,22 +270,36 @@ public class CharacterManager : MonoBehaviour
             return;
         }
 
-        testEquipmentDataAsset.equipmentSet.Clear();
-        for (int i = 0; i < myEquipmentSet.Count; i++)
+        // Lưu Skin
+        testEquipmentDataAsset.skinNames.Clear();
+        for (int i = 0; i < mySkinSet.Count; i++)
         {
-            var pair = myEquipmentSet[i];
-            testEquipmentDataAsset.equipmentSet.Add(new SlotAttachmentPair
+            if (mySkinSet[i].isEnabled && !string.IsNullOrEmpty(mySkinSet[i].skinName))
             {
-                isEnabled = pair.isEnabled,
-                slotName = pair.slotName,
-                attachmentName = pair.attachmentName,
-                skeletonDataAsset = pair.skeletonDataAsset
-            });
+                testEquipmentDataAsset.skinNames.Add(mySkinSet[i].skinName);
+            }
+        }
+
+        // Lưu Attachment
+        testEquipmentDataAsset.equipmentSet.Clear();
+        if (myEquipmentSet != null)
+        {
+            for (int i = 0; i < myEquipmentSet.Count; i++)
+            {
+                var pair = myEquipmentSet[i];
+                testEquipmentDataAsset.equipmentSet.Add(new SlotAttachmentPair
+                {
+                    isEnabled = pair.isEnabled,
+                    slotName = pair.slotName,
+                    attachmentName = pair.attachmentName,
+                    skeletonDataAsset = pair.skeletonDataAsset
+                });
+            }
         }
 
         UnityEditor.EditorUtility.SetDirty(testEquipmentDataAsset);
         UnityEditor.AssetDatabase.SaveAssets();
-        Debug.Log($"Đã lưu dữ liệu trang bị vào Asset: {testEquipmentDataAsset.name}");
+        Debug.Log($"Đã lưu {testEquipmentDataAsset.skinNames.Count} skin và {testEquipmentDataAsset.equipmentSet.Count} attachment vào Asset: {testEquipmentDataAsset.name}");
     }
 
     [HorizontalGroup("SaveLoad")]
@@ -281,9 +313,17 @@ public class CharacterManager : MonoBehaviour
             return;
         }
 
+        // Tải Skin
+        if (mySkinSet == null || mySkinSet.Count == 0) GetAllSkins();
+        HashSet<string> savedSkins = new HashSet<string>(testEquipmentDataAsset.skinNames);
+        for (int i = 0; i < mySkinSet.Count; i++)
+        {
+            mySkinSet[i].isEnabled = savedSkins.Contains(mySkinSet[i].skinName);
+        }
+
+        // Tải Attachment
         if (myEquipmentSet == null) myEquipmentSet = new List<SlotAttachmentPair>();
         myEquipmentSet.Clear();
-
         for (int i = 0; i < testEquipmentDataAsset.equipmentSet.Count; i++)
         {
             var pair = testEquipmentDataAsset.equipmentSet[i];
@@ -296,45 +336,186 @@ public class CharacterManager : MonoBehaviour
             });
         }
 
-        Debug.Log($"Đã tải dữ liệu trang bị từ Asset: {testEquipmentDataAsset.name}");
+        Debug.Log($"Đã tải {testEquipmentDataAsset.skinNames.Count} skin và {testEquipmentDataAsset.equipmentSet.Count} attachment từ Asset: {testEquipmentDataAsset.name}");
         EditorEquip(); // Cập nhật luôn lên màn hình test
     }
 
-    [Button("Gán Skeleton Data Từ Target", ButtonSizes.Medium)]
-    [GUIColor(0.2f, 0.8f, 0.2f)]
-    public void AssignSkeletonDataToAll()
-    {
-        if (myEquipmentSet == null || targetTestCharacter == null || targetTestCharacter.SkeletonAnimation == null) return;
-        var skeletonData = targetTestCharacter.SkeletonAnimation.SkeletonDataAsset;
-        for (int i = 0; i < myEquipmentSet.Count; i++)
-        {
-            myEquipmentSet[i].skeletonDataAsset = skeletonData;
-        }
-    }
-
-    [Button("Mặc Đồ Ngay (Chỉ Target)")]
+    // ===== MẶC ĐỒ NGAY =====
+    [Button("Mặc Đồ Ngay (Chỉ Target)", ButtonSizes.Medium)]
+    [GUIColor(0.4f, 1f, 0.4f)]
     public void EditorEquip()
     {
-        if (myEquipmentSet == null || targetTestCharacter == null) return;
-        
-        targetTestCharacter.EquipFromSlotAttachmentPairs(myEquipmentSet);
+        if (targetTestCharacter == null) return;
+
+        List<string> enabledSkins = new List<string>();
+        if (mySkinSet != null)
+        {
+            for (int i = 0; i < mySkinSet.Count; i++)
+            {
+                if (mySkinSet[i].isEnabled && !string.IsNullOrEmpty(mySkinSet[i].skinName))
+                {
+                    enabledSkins.Add(mySkinSet[i].skinName);
+                }
+            }
+        }
+
+        targetTestCharacter.MixSkinsAndAttachments(enabledSkins, myEquipmentSet);
+        Debug.Log($"Đã mặc {enabledSkins.Count} skin và {myEquipmentSet?.Count ?? 0} cấu hình attachment.");
     }
 
     [Button("Tắt Tất Cả Đồ (Chỉ Target)", ButtonSizes.Medium)]
     [GUIColor(1f, 0.4f, 0.4f)]
     public void DisableAllItems()
     {
-        if (myEquipmentSet == null || targetTestCharacter == null) return;
-        
-        for (int i = 0; i < myEquipmentSet.Count; i++)
+        if (targetTestCharacter == null) return;
+
+        if (mySkinSet != null)
         {
-            var pair = myEquipmentSet[i];
-            pair.isEnabled = false;
+            for (int i = 0; i < mySkinSet.Count; i++) mySkinSet[i].isEnabled = false;
         }
-        
-        // Đắp lại skin rỗng (chỉ có Default Skin)
-        targetTestCharacter.EquipFromSlotAttachmentPairs(myEquipmentSet);
+
+        if (myEquipmentSet != null)
+        {
+            for (int i = 0; i < myEquipmentSet.Count; i++) myEquipmentSet[i].isEnabled = false;
+        }
+
+        // Đắp lại rỗng
+        targetTestCharacter.MixSkinsAndAttachments(new List<string>(), myEquipmentSet);
     }
 
 #endif
 }
+
+#if UNITY_EDITOR
+/// <summary>
+/// Một entry trong danh sách skin, có checkbox bật/tắt.
+/// </summary>
+[System.Serializable]
+public class SkinToggleEntry
+{
+    [TableColumnWidth(50, Resizable = false)]
+    [LabelText("Bật")]
+    public bool isEnabled;
+
+    [LabelText("Tên Skin")]
+    public string skinName;
+
+    [HideInInspector]
+    public SkeletonDataAsset skeletonDataAsset;
+
+    // ===== PREVIEW ẢNH SKIN =====
+    private static Dictionary<string, Texture2D> _previewCache = new Dictionary<string, Texture2D>();
+
+    [ShowInInspector]
+    [PreviewField(45, ObjectFieldAlignment.Center)]
+    [TableColumnWidth(55, Resizable = false)]
+    [LabelText("Ảnh")]
+    public Texture2D SkinPreview
+    {
+        get
+        {
+            if (skeletonDataAsset == null || string.IsNullOrEmpty(skinName))
+                return null;
+
+            string key = $"{skeletonDataAsset.GetInstanceID()}_{skinName}";
+            if (_previewCache.TryGetValue(key, out var cached) && cached != null)
+                return cached;
+
+            var preview = GeneratePreview();
+            if (preview != null)
+                _previewCache[key] = preview;
+            return preview;
+        }
+    }
+
+    public static void ClearPreviewCache()
+    {
+        foreach (var tex in _previewCache.Values)
+        {
+            if (tex != null) Object.DestroyImmediate(tex);
+        }
+        _previewCache.Clear();
+    }
+
+    private Texture2D GeneratePreview()
+    {
+        var skeletonData = skeletonDataAsset.GetSkeletonData(true);
+        if (skeletonData == null) return null;
+
+        var skin = skeletonData.FindSkin(skinName);
+        if (skin == null) return null;
+
+        // Lấy attachment đầu tiên có chứa hình ảnh trong skin này
+        foreach (var entry in skin.Attachments)
+        {
+            var attachment = entry.Attachment;
+            AtlasRegion region = null;
+            if (attachment is RegionAttachment regionAtt)
+                region = regionAtt.Region as AtlasRegion;
+            else if (attachment is MeshAttachment meshAtt)
+                region = meshAtt.Region as AtlasRegion;
+
+            if (region != null)
+                return ExtractRegionTexture(region);
+        }
+
+        return null;
+    }
+
+    private static Texture2D ExtractRegionTexture(AtlasRegion region)
+    {
+        Texture2D atlasTexture = null;
+        if (region.page.rendererObject is Material mat)
+            atlasTexture = mat.mainTexture as Texture2D;
+        else if (region.page.rendererObject is Texture2D tex)
+            atlasTexture = tex;
+        if (atlasTexture == null) return null;
+
+        float minU = Mathf.Min(region.u, region.u2);
+        float minV = Mathf.Min(region.v, region.v2);
+        float maxU = Mathf.Max(region.u, region.u2);
+        float maxV = Mathf.Max(region.v, region.v2);
+
+        int regionW = Mathf.Max(1, Mathf.RoundToInt((maxU - minU) * atlasTexture.width));
+        int regionH = Mathf.Max(1, Mathf.RoundToInt((maxV - minV) * atlasTexture.height));
+
+        int maxSize = 64;
+        int previewW = regionW;
+        int previewH = regionH;
+        if (previewW > maxSize || previewH > maxSize)
+        {
+            float aspect = (float)previewW / previewH;
+            if (previewW >= previewH)
+            {
+                previewW = maxSize;
+                previewH = Mathf.Max(1, Mathf.RoundToInt(maxSize / aspect));
+            }
+            else
+            {
+                previewH = maxSize;
+                previewW = Mathf.Max(1, Mathf.RoundToInt(maxSize * aspect));
+            }
+        }
+
+        RenderTexture rt = RenderTexture.GetTemporary(previewW, previewH, 0, RenderTextureFormat.ARGB32);
+        rt.filterMode = FilterMode.Bilinear;
+
+        Vector2 scale = new Vector2(maxU - minU, maxV - minV);
+        Vector2 offset = new Vector2(minU, minV);
+        Graphics.Blit(atlasTexture, rt, scale, offset);
+
+        RenderTexture previous = RenderTexture.active;
+        RenderTexture.active = rt;
+
+        Texture2D preview = new Texture2D(previewW, previewH, TextureFormat.ARGB32, false);
+        preview.ReadPixels(new Rect(0, 0, previewW, previewH), 0, 0);
+        preview.Apply();
+        preview.hideFlags = HideFlags.HideAndDontSave;
+
+        RenderTexture.active = previous;
+        RenderTexture.ReleaseTemporary(rt);
+
+        return preview;
+    }
+}
+#endif

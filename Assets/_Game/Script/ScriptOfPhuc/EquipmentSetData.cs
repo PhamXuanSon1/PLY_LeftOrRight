@@ -11,24 +11,20 @@ using Sirenix.OdinInspector;
 public class EquipmentSetData : ScriptableObject
 {
 #if UNITY_EDITOR
-    [Title("Dữ Liệu Trang Bị")]
+    [Title("Dữ Liệu Trang Bị (Skin-Based)")]
     [HorizontalGroup("SkeletonGroup")]
     [HideLabel]
     public SkeletonDataAsset targetSkeletonDataAsset;
+#endif
 
-    [HorizontalGroup("SkeletonGroup", Width = 150)]
-    [Button("Gán Skeleton Data", ButtonSizes.Medium)]
-    [GUIColor(0.2f, 0.8f, 0.2f)]
-    public void AssignSkeletonData()
-    {
-        for (int i = 0; i < equipmentSet.Count; i++)
-        {
-            equipmentSet[i].skeletonDataAsset = targetSkeletonDataAsset;
-        }
-    }
+    [Tooltip("Danh sách tên các Skin sẽ được gộp (mix) lại để mặc cho nhân vật")]
+    public List<string> skinNames = new List<string>();
 
+#if UNITY_EDITOR
+    [Title("Dữ Liệu Trang Bị (Attachment-Based)")]
     [TableList]
     [Searchable]
 #endif
+    [Tooltip("Danh sách các Attachment ghi đè lên các slot cụ thể")]
     public List<SlotAttachmentPair> equipmentSet = new List<SlotAttachmentPair>();
 }
