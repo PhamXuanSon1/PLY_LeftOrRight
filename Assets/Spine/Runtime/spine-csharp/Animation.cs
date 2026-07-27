@@ -2462,9 +2462,13 @@ namespace Spine {
 	public abstract class PhysicsConstraintTimeline : CurveTimeline1 {
 		readonly int constraintIndex;
 
+		private static string GetPropertyId(int physicsConstraintIndex, Property property) {
+			return (int)property + "|" + physicsConstraintIndex;
+		}
+
 		/// <param name="physicsConstraintIndex">-1 for all physics constraints in the skeleton.</param>
 		public PhysicsConstraintTimeline (int frameCount, int bezierCount, int physicsConstraintIndex, Property property)
-			: base(frameCount, bezierCount, (int)property + "|" + physicsConstraintIndex) {
+			: base(frameCount, bezierCount, GetPropertyId(physicsConstraintIndex, property)) {
 
 			constraintIndex = physicsConstraintIndex;
 		}

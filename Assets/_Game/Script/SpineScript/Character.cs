@@ -20,7 +20,7 @@ public class Character : Ply_GameUnit
 
     // Lưu lại danh sách Skin (phiên bản gộp skin name cũ) để tương thích
     [SerializeField, HideInInspector]
-    private List<string> currentAppliedSkinNames = new List<string>();
+    public List<string> currentAppliedSkinNames = new List<string>();
 
     // Dictionary để lưu lại trạng thái ép buộc của các slot (dùng cho SpineEmotionController, ToggleBoneSlot)
     private Dictionary<string, string> forcedAttachments = new Dictionary<string, string>();
@@ -82,33 +82,42 @@ public class Character : Ply_GameUnit
     }
 #endif
 
-    // Xử lý xung đột với Animation
-    protected virtual void Start()
-    {
-        // Chỉ chạy khi đang Play game, không chạy ở Editor Mode
-        if (!Application.isPlaying) return;
+    private bool isSkinAppliedAtRuntime = false;
+    private MeshFilter cachedMeshFilter;
 
-        if (skeletonAnimation != null)
+    // Chủ động mặc đồ khi game bắt đầu (fix lỗi mất nhân vật trên Luna)
+    protected virtual void Update()
+    {
+        if (Application.isPlaying && !isSkinAppliedAtRuntime)
         {
-            // Đăng ký event để chạy hàm ApplyForcedAttachments mỗi khi animation tính toán xong 1 frame
-            skeletonAnimation.UpdateComplete += ApplyForcedAttachments;
+            if (skeletonAnimation != null && skeletonAnimation.Skeleton != null)
+            {
+                cachedMeshFilter = skeletonAnimation.GetComponent<MeshFilter>();
+
+                bool hasSkins = currentAppliedSkinNames != null && currentAppliedSkinNames.Count > 0;
+                bool hasPairs = currentAppliedPairs != null && currentAppliedPairs.Count > 0;
+                if (hasSkins || hasPairs)
+                {
+                    ApplySkinsAndAttachmentsMix(currentAppliedSkinNames, currentAppliedPairs);
+                    skeletonAnimation.LateUpdate();
+                }
+                isSkinAppliedAtRuntime = true;
+            }
         }
     }
 
-    private void ApplyForcedAttachments(ISkeletonAnimation animated)
+    // === FIX LUNA FRUSTUM CULLING ===
+    // Spine tạo lại mesh mỗi frame với bounds rất sát người.
+    // Luna dựa vào bounds này để cull (ẩn) nhân vật khi nó ở rìa camera.
+    // LateUpdate chạy SAU khi Spine đã tạo xong mesh → ta ép bounds cực lớn.
+    private void LateUpdate()
     {
-        for (int i = 0; i < forcedAttachmentKeys.Count; i++)
+        if (!Application.isPlaying) return;
+        if (cachedMeshFilter == null && skeletonAnimation != null)
+            cachedMeshFilter = skeletonAnimation.GetComponent<MeshFilter>();
+        if (cachedMeshFilter != null && cachedMeshFilter.sharedMesh != null)
         {
-            string key = forcedAttachmentKeys[i];
-            string value = forcedAttachments[key];
-            try
-            {
-                skeletonAnimation.Skeleton.SetAttachment(key, value);
-            }
-            catch (System.Exception)
-            {
-                // Bỏ log warning ở đây để tránh spam mỗi frame
-            }
+            cachedMeshFilter.sharedMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 2000f);
         }
     }
 

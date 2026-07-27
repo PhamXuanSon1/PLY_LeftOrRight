@@ -5,7 +5,7 @@ public class ProgressTrackingManager : MonoBehaviour
     public static ProgressTrackingManager Instance { get; private set; }
 
     [Header("Progress Settings")]
-    [Tooltip("Tổng số điểm/item tối đa (Sẽ được tự động tính toán dựa trên Flow Mode của UIManager)")]
+    [Tooltip("Tổng số điểm/item tối đa (Nhập tay trên Inspector)")]
     public int maxScore = 10; 
 
     [Header("Debug (Chỉ xem khi đang chơi)")]
@@ -28,10 +28,6 @@ public class ProgressTrackingManager : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-        AppLovinAnalytics.TrackChallengeStarted();
-    }
     /// <summary>
     /// Cộng thêm điểm (mặc định thêm 1). Bạn có thể gọi hàm này mỗi khi user hoàn thành 1 item.
     /// Vd: ProgressTrackingManager.Instance.AddProgress();
@@ -48,16 +44,10 @@ public class ProgressTrackingManager : MonoBehaviour
     {
         currentScore = score;
 
-        int dynamicMaxScore = GetDynamicMaxScore();
-        if (dynamicMaxScore > 0)
-        {
-            maxScore = dynamicMaxScore;
-        }
-
         // Bắn event Started ngay lần đầu tiên user hoàn thành 1 item
         if (!isStarted && currentScore > 0)
         {
-            AppLovinAnalytics.TrackChallengeStarted();
+            // AppLovinAnalytics.TrackChallengeStarted();
             Debug.Log("Track: Challenge Started");
             isStarted = true;
         }
@@ -69,13 +59,15 @@ public class ProgressTrackingManager : MonoBehaviour
 
         if (progressPercent >= 25 && !pass25)
         {
-            AppLovinAnalytics.TrackChallengePass25();
+            // AppLovinAnalytics.TrackChallengePass25();
+            Debug.Log("Track: Challenge Pass 25%");
             pass25 = true;
         }
 
         if (progressPercent >= 50 && !pass50)
         {
-            AppLovinAnalytics.TrackChallengePass50();
+            // AppLovinAnalytics.TrackChallengePass50();
+            Debug.Log("Track: Challenge Pass 50%");
             pass50 = true;
         }
 
@@ -92,41 +84,5 @@ public class ProgressTrackingManager : MonoBehaviour
             Debug.Log("Track: Challenge Solved 100%");
             pass100 = true;
         }
-    }
-
-    private int GetDynamicMaxScore()
-    {
-        // Hiện tại trong project này chưa có UIManager, ItemManager và PlayableFlowMode.
-        // Có vẻ script này được copy từ một project cũ. 
-        // Tạm thời mình comment lại logic động này và chỉ trả về maxScore gốc.
-        // Bạn có thể sửa lại logic lấy tổng số item theo project hiện tại (ví dụ lấy từ SlotManager).
-        
-        /*
-        if (UIManager.Instance == null || ItemManager.Instance == null) return maxScore;
-
-        PlayableFlowMode mode = UIManager.Instance.flowMode;
-        int totalItems = UIManager.Instance.mauSo;
-        int phase1Count = ItemManager.Instance.stages != null && ItemManager.Instance.stages.Length > 0 
-            ? ItemManager.Instance.stages[0].itemList.Length : totalItems;
-        int endCount = UIManager.Instance.endGameCount;
-
-        switch (mode)
-        {
-            case PlayableFlowMode.PlayAll_NoStore:
-            case PlayableFlowMode.StoreAfterPhase1_CanContinue:
-            case PlayableFlowMode.PlayAll_ShowEndcard_Store:
-                return totalItems;
-                
-            case PlayableFlowMode.StoreAfterPhase1_End:
-                return Mathf.Min(phase1Count, endCount);
-
-            case PlayableFlowMode.StoreAtLastItem_End:
-                return Mathf.Min(endCount - 1, totalItems - 1);
-        }
-
-        return totalItems;
-        */
-        
-        return maxScore;
     }
 }

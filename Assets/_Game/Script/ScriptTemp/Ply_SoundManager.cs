@@ -8,11 +8,9 @@ using UnityEditor;
 
 public enum FxType
 {
-    Click,
-    Happy,
-    Wrong,
-    Spray,
-    Brush,
+    Left,
+    Right,
+    Yeah
 }
 
 [System.Serializable]
@@ -25,17 +23,15 @@ public class SoundData
 [System.Serializable]
 public class FxAudio
 {
-    public SoundData ClickBox;
-    public SoundData Happy;
-    public SoundData Wrong;
-    public SoundData Spray;
-    public SoundData Brush;
+    public SoundData Left;
+    public SoundData Right;
+    public SoundData Yeah;
 }
 
 public class Ply_SoundManager : Ply_Singleton<Ply_SoundManager>
 {
     public FxAudio fxAudio;
-    public AudioSource bgm1;
+    public AudioSource bgm;
     private AudioSource[] fx = new AudioSource[10];
 
     bool isMute = false;
@@ -91,26 +87,19 @@ public class Ply_SoundManager : Ply_Singleton<Ply_SoundManager>
         }
     }
 
-    public void PlayBGM1()
+    public void PlayBGM()
     {
         if (isMute) return;
-        if (bgm1 != null && !bgm1.isPlaying) bgm1.Play();
-    }
-
-    public void PlayBGM2()
-    {
-        PlayBGM1();
+        if (bgm != null && !bgm.isPlaying) bgm.Play();
     }
 
     private SoundData GetSoundData(FxType type)
     {
         switch (type)
         {
-            case FxType.Click: return fxAudio.ClickBox;
-            case FxType.Happy: return fxAudio.Happy;
-            case FxType.Wrong: return fxAudio.Wrong;
-            case FxType.Spray: return fxAudio.Spray;
-            case FxType.Brush: return fxAudio.Brush;
+            case FxType.Left: return fxAudio.Left;
+            case FxType.Right: return fxAudio.Right;
+            case FxType.Yeah: return fxAudio.Yeah;
             default: return null;
         }
     }
@@ -129,7 +118,7 @@ public class Ply_SoundManager : Ply_Singleton<Ply_SoundManager>
 
     public void Mute()
     {
-        if (bgm1 != null) bgm1.Stop();
+        if (bgm != null) bgm.Stop();
         for (int i = 0; i < fx.Length; i++)
         {
             if (fx[i] != null)

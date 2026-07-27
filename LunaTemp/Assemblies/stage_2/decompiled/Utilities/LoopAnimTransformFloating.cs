@@ -1,0 +1,105 @@
+using UnityEngine;
+
+namespace Utilities
+{
+	public class LoopAnimTransformFloating : MonoBehaviour
+	{
+		public float cycleDuration = 1f;
+
+		public float positionCurveMul = 1f;
+
+		public KeyframeData[] curveX = new KeyframeData[2]
+		{
+			new KeyframeData(0f, 0f),
+			new KeyframeData(1f, 0f)
+		};
+
+		public KeyframeData[] curveY = new KeyframeData[4]
+		{
+			new KeyframeData(0f, 0f),
+			new KeyframeData(0.3f, 0.7f),
+			new KeyframeData(0.6f, 0.7f),
+			new KeyframeData(1f, 0f)
+		};
+
+		public bool isUseScaleTime = false;
+
+		public bool isRandomTimeOffset = false;
+
+		public Vector2 timeOffset = Vector2.zero;
+
+		private Transform _transform;
+
+		private Vector3 _startPos;
+
+		private bool isClose = false;
+
+		private void OnEnable()
+		{
+			ResetFloatingAnchor();
+		}
+
+		public void ResetFloatingAnchor()
+		{
+			_transform = base.transform;
+			_startPos = _transform.localPosition;
+			if (isRandomTimeOffset)
+			{
+				timeOffset = new Vector2(Random.Range(0f, cycleDuration), Random.Range(0f, cycleDuration));
+			}
+		}
+
+		private float EvaluateCurve(KeyframeData[] keyframes, float time)
+		{
+			if (keyframes == null || keyframes.Length == 0)
+			{
+				return 0f;
+			}
+			if (keyframes.Length == 1)
+			{
+				return keyframes[0].value;
+			}
+			for (int i = 0; i < keyframes.Length - 1; i++)
+			{
+				if (time >= keyframes[i].time && time <= keyframes[i + 1].time)
+				{
+					float t = (time - keyframes[i].time) / (keyframes[i + 1].time - keyframes[i].time);
+					return Mathf.Lerp(keyframes[i].value, keyframes[i + 1].value, t);
+				}
+			}
+			if (time < keyframes[0].time)
+			{
+				return keyframes[0].value;
+			}
+			return keyframes[keyframes.Length - 1].value;
+		}
+
+		private void Update()
+		{
+			if (isClose)
+			{
+				CloseEye();
+				return;
+			}
+			float timeX = Mathf.Repeat(((isUseScaleTime ? Time.time : Time.unscaledTime) + timeOffset.x) / cycleDuration, 1f);
+			float timeY = Mathf.Repeat(((isUseScaleTime ? Time.time : Time.unscaledTime) + timeOffset.y) / cycleDuration, 1f);
+			_transform.localPosition = new Vector3(_startPos.x + positionCurveMul * EvaluateCurve(curveX, timeX), _startPos.y + positionCurveMul * EvaluateCurve(curveY, timeY), _startPos.z);
+		}
+
+		public void CloseEye()
+		{
+			isClose = true;
+			_transform.localPosition = new Vector3(_startPos.x + positionCurveMul * EvaluateCurve(curveX, 1f), _startPos.y + positionCurveMul * EvaluateCurve(curveY, 1f), _startPos.z);
+		}
+
+		public void OpenEyeFloating()
+		{
+			isClose = false;
+		}
+
+		private void OnDisable()
+		{
+			_transform.localPosition = _startPos;
+		}
+	}
+}
