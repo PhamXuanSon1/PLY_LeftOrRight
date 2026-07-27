@@ -19,3 +19,5 @@ MonoBehaviour:
   - accessories/acc_rw_ad3
   - face/face_rw_ad3
   - hair/hair_rw_ad3
+  useEquipmentSet: 0
+  equipmentSet: []

@@ -22,8 +22,14 @@ public class EquipmentSetData : ScriptableObject
 
 #if UNITY_EDITOR
     [Title("Dữ Liệu Trang Bị (Attachment-Based)")]
+    [Tooltip("Bật/Tắt sử dụng danh sách Attachment bên dưới")]
+    public bool useEquipmentSet = true;
+
+    [EnableIf("useEquipmentSet")]
     [TableList]
     [Searchable]
+#else
+    public bool useEquipmentSet = true;
 #endif
     [Tooltip("Danh sách các Attachment ghi đè lên các slot cụ thể")]
     public List<SlotAttachmentPair> equipmentSet = new List<SlotAttachmentPair>();

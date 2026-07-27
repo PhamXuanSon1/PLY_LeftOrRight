@@ -22,6 +22,7 @@ MonoBehaviour:
   - skirt/skirt_haloween4
   - skirt/skirt_Kpop_3
   - skirt/skirt_rw_ad3
+  useEquipmentSet: 0
   equipmentSet:
   - isEnabled: 0
     slotName: acc_christmast_8-acc
@@ -426,10 +427,6 @@ MonoBehaviour:
   - isEnabled: 0
     slotName: face1-face
     attachmentName: 
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
-    slotName: face 1
-    attachmentName: face 1
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     slotName: hair

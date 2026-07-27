@@ -16,8 +16,11 @@ public class BalloonController : MonoBehaviour
     [Tooltip("Thời gian thu nhỏ về 0 (chạy song song với bay)")]
     public float scaleDuration = 0.5f;
 
-    [Tooltip("Thời gian chờ thêm trước khi load Slot tiếp theo")]
+    [Header("Thời gian chờ thêm trước khi load Slot tiếp theo")]
     public float delayBeforeNextSlot = 0.2f;
+
+    [Header("Sự kiện khi click vào balloon")]
+    public UnityEngine.Events.UnityEvent onBalloonClicked;
 
     private bool isAnimating = false;
 
@@ -44,6 +47,9 @@ public class BalloonController : MonoBehaviour
                     if (targetItem != null && SlotManager.Instance != null)
                     {
                         isAnimating = true;
+
+                        // Kích hoạt sự kiện click (Ví dụ: để gọi PlayAnimation)
+                        onBalloonClicked?.Invoke();
 
                         // Tạm ẩn 2 balloon
                         SlotManager.Instance.HideBalloons();

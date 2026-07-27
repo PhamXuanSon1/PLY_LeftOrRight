@@ -216,10 +216,25 @@ public class Character : Ply_GameUnit
                 var pair = pairs[i];
                 if (!string.IsNullOrEmpty(pair.slotName))
                 {
-                    if (pair.isEnabled && !string.IsNullOrEmpty(pair.attachmentName))
-                        skeleton.SetAttachment(pair.slotName, pair.attachmentName);
-                    else
-                        skeleton.SetAttachment(pair.slotName, null);
+                    try
+                    {
+                        if (pair.isEnabled && !string.IsNullOrEmpty(pair.attachmentName))
+                        {
+                            skeleton.SetAttachment(pair.slotName, pair.attachmentName);
+                            if (!forcedAttachments.ContainsKey(pair.slotName)) forcedAttachmentKeys.Add(pair.slotName);
+                            forcedAttachments[pair.slotName] = pair.attachmentName;
+                        }
+                        else
+                        {
+                            skeleton.SetAttachment(pair.slotName, null);
+                            if (!forcedAttachments.ContainsKey(pair.slotName)) forcedAttachmentKeys.Add(pair.slotName);
+                            forcedAttachments[pair.slotName] = null;
+                        }
+                    }
+                    catch (System.Exception)
+                    {
+                        // Ignore if slot or attachment not found
+                    }
                 }
             }
         }
@@ -315,13 +330,23 @@ public class Character : Ply_GameUnit
                 if (pair.isEnabled && !string.IsNullOrEmpty(pair.attachmentName))
                 {
                     // Ép bật món đồ này lên
-                    try { skeleton.SetAttachment(pair.slotName, pair.attachmentName); }
+                    try 
+                    { 
+                        skeleton.SetAttachment(pair.slotName, pair.attachmentName); 
+                        if (!forcedAttachments.ContainsKey(pair.slotName)) forcedAttachmentKeys.Add(pair.slotName);
+                        forcedAttachments[pair.slotName] = pair.attachmentName;
+                    }
                     catch (System.Exception) { }
                 }
                 else
                 {
                     // Ép tắt nếu không tick
-                    try { skeleton.SetAttachment(pair.slotName, null); }
+                    try 
+                    { 
+                        skeleton.SetAttachment(pair.slotName, null); 
+                        if (!forcedAttachments.ContainsKey(pair.slotName)) forcedAttachmentKeys.Add(pair.slotName);
+                        forcedAttachments[pair.slotName] = null;
+                    }
                     catch (System.Exception) { }
                 }
             }

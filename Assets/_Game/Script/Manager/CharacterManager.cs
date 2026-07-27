@@ -53,6 +53,10 @@ public class CharacterManager : MonoBehaviour
     // ===== DANH SÁCH ATTACHMENT GHI ĐÈ =====
     [Title("Danh Sách Attachment Ghi Đè (Overrides)")]
     [InfoBox("Tick vào các chi tiết bạn muốn ép bật/tắt đè lên các Skin ở trên.")]
+    [LabelText("Sử dụng bảng Attachment")]
+    public bool useEquipmentOverrides = true;
+
+    [EnableIf("useEquipmentOverrides")]
     [ListDrawerSettings(ShowFoldout = true)]
     [Searchable]
     public List<SlotAttachmentPair> myEquipmentSet = new List<SlotAttachmentPair>();
@@ -120,7 +124,8 @@ public class CharacterManager : MonoBehaviour
     public void EquipCharacter(Character character, EquipmentSetData equipmentData)
     {
         if (character == null || equipmentData == null) return;
-        character.MixSkinsAndAttachments(equipmentData.skinNames, equipmentData.equipmentSet);
+        List<SlotAttachmentPair> pairsToUse = equipmentData.useEquipmentSet ? equipmentData.equipmentSet : null;
+        character.MixSkinsAndAttachments(equipmentData.skinNames, pairsToUse);
     }
 
     // Mặc đồ từ thông tin của ItemController (Hỗ trợ Item có nhiều part/slot)
@@ -281,6 +286,7 @@ public class CharacterManager : MonoBehaviour
         }
 
         // Lưu Attachment
+        testEquipmentDataAsset.useEquipmentSet = this.useEquipmentOverrides;
         testEquipmentDataAsset.equipmentSet.Clear();
         if (myEquipmentSet != null)
         {
@@ -322,6 +328,7 @@ public class CharacterManager : MonoBehaviour
         }
 
         // Tải Attachment
+        this.useEquipmentOverrides = testEquipmentDataAsset.useEquipmentSet;
         if (myEquipmentSet == null) myEquipmentSet = new List<SlotAttachmentPair>();
         myEquipmentSet.Clear();
         for (int i = 0; i < testEquipmentDataAsset.equipmentSet.Count; i++)
@@ -359,8 +366,9 @@ public class CharacterManager : MonoBehaviour
             }
         }
 
-        targetTestCharacter.MixSkinsAndAttachments(enabledSkins, myEquipmentSet);
-        Debug.Log($"Đã mặc {enabledSkins.Count} skin và {myEquipmentSet?.Count ?? 0} cấu hình attachment.");
+        List<SlotAttachmentPair> pairsToUse = useEquipmentOverrides ? myEquipmentSet : null;
+        targetTestCharacter.MixSkinsAndAttachments(enabledSkins, pairsToUse);
+        Debug.Log($"Đã mặc {enabledSkins.Count} skin và {pairsToUse?.Count ?? 0} cấu hình attachment.");
     }
 
     [Button("Tắt Tất Cả Đồ (Chỉ Target)", ButtonSizes.Medium)]
@@ -380,7 +388,8 @@ public class CharacterManager : MonoBehaviour
         }
 
         // Đắp lại rỗng
-        targetTestCharacter.MixSkinsAndAttachments(new List<string>(), myEquipmentSet);
+        List<SlotAttachmentPair> pairsToUse = useEquipmentOverrides ? myEquipmentSet : null;
+        targetTestCharacter.MixSkinsAndAttachments(new List<string>(), pairsToUse);
     }
 
 #endif
