@@ -1,7 +1,7 @@
 {
     "version": "7.1.0",
     "projectId": "a6751afac85ec2744a912b2a685dda8d",
-    "applicationID": 0,
+    "applicationID": 27599,
     "creativeName": "",
     "pgServer": "EU",
     "window": {
@@ -122,9 +122,7 @@
                 "Stubs/AppsFlyer",
                 "Stubs/IronSource",
                 "Stubs/Vungle",
-                "Stubs/MoreMountains.NiceVibrations",
-                "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset",
-                "Assets/TextMesh Pro/Sprites/EmojiOne.png"
+                "Stubs/MoreMountains.NiceVibrations"
             ],
             "includes": [
                 "Assets/Resources/DOTweenSettings.asset",
@@ -157,7 +155,7 @@
             "logo": ""
         },
         "enableRealtimeShadows": false,
-        "enableLunaCompilerV2": true,
+        "enableLunaCompilerV2": false,
         "optimiseShaderVariantsExport": true,
         "enableMecanimWASM": true,
         "minify": true,
@@ -1758,10 +1756,6 @@
                 "excluded": true
             },
             {
-                "name": "UnityEngine.RangeAttribute",
-                "excluded": true
-            },
-            {
                 "name": "UnityEngine.RangeInt",
                 "excluded": true
             },
@@ -2039,6 +2033,10 @@
             },
             {
                 "name": "UnityEngine.GUILayout.VerticalScope",
+                "excluded": true
+            },
+            {
+                "name": "UnityEngine.HeaderAttribute",
                 "excluded": true
             },
             {
@@ -4099,7 +4097,7 @@
             },
             {
                 "name": "UnityEngine.PropertyAttribute",
-                "excluded": false
+                "excluded": true
             },
             {
                 "name": "UnityEngine.HideFlags",
@@ -5151,7 +5149,7 @@
             },
             {
                 "name": "UnityEngine.Scripting.PreserveAttribute",
-                "excluded": true
+                "excluded": false
             },
             {
                 "name": "UnityEngine.RuntimePlatform",
@@ -7618,27 +7616,7 @@
                 "excluded": false
             },
             {
-                "name": "AlignToScreenLeft",
-                "excluded": true
-            },
-            {
-                "name": "AppLovinAnalytics",
-                "excluded": true
-            },
-            {
-                "name": "AppLovinAnalyticsExample",
-                "excluded": true
-            },
-            {
-                "name": "ArrangedItem",
-                "excluded": true
-            },
-            {
                 "name": "BoneOverrideData",
-                "excluded": true
-            },
-            {
-                "name": "CustomUIScrollbar",
                 "excluded": true
             },
             {
@@ -7694,31 +7672,7 @@
                 "excluded": true
             },
             {
-                "name": "IntroAnimationEvent",
-                "excluded": true
-            },
-            {
-                "name": "ItemArranger",
-                "excluded": true
-            },
-            {
                 "name": "ItemController",
-                "excluded": true
-            },
-            {
-                "name": "KeyframeData",
-                "excluded": true
-            },
-            {
-                "name": "LunaAppLovinAnalyticsTestHelper",
-                "excluded": true
-            },
-            {
-                "name": "PlayAnim",
-                "excluded": true
-            },
-            {
-                "name": "ScreenHeightPositionAnchor",
                 "excluded": true
             },
             {
@@ -7731,10 +7685,6 @@
             },
             {
                 "name": "Spine.InheritEnum",
-                "excluded": true
-            },
-            {
-                "name": "Spine.MathUtils",
                 "excluded": true
             },
             {
@@ -7802,23 +7752,7 @@
                 "excluded": true
             },
             {
-                "name": "Spine.Unity.FollowLocationRigidbody",
-                "excluded": true
-            },
-            {
-                "name": "Spine.Unity.FollowLocationRigidbody2D",
-                "excluded": true
-            },
-            {
-                "name": "Spine.Unity.FollowSkeletonUtilityRootRotation",
-                "excluded": true
-            },
-            {
                 "name": "Spine.Unity.ISpineComponentExtensions",
-                "excluded": true
-            },
-            {
-                "name": "Spine.Unity.MathUtilities",
                 "excluded": true
             },
             {
@@ -7935,18 +7869,6 @@
             },
             {
                 "name": "ToggleBoneSlot",
-                "excluded": true
-            },
-            {
-                "name": "Utilities.LoopAnimTransformFloating",
-                "excluded": true
-            },
-            {
-                "name": "WorldSpaceScrollbar",
-                "excluded": true
-            },
-            {
-                "name": "Yielders",
                 "excluded": true
             },
             {
@@ -8210,6 +8132,10 @@
                 "excluded": false
             },
             {
+                "name": "IAmAnEmptyScriptJustToMakeCodelessProjectsCompileProperty",
+                "excluded": true
+            },
+            {
                 "name": "ItemAttachmentSetup",
                 "excluded": true
             },
@@ -8283,7 +8209,7 @@
             },
             {
                 "name": "Spine.Property",
-                "excluded": true
+                "excluded": false
             },
             {
                 "name": "Spine.RotateMode",
@@ -8339,10 +8265,6 @@
             },
             {
                 "name": "Spine.Unity.BoneFollower.AxisOrientation",
-                "excluded": true
-            },
-            {
-                "name": "Spine.Unity.SettingsTriState",
                 "excluded": true
             },
             {
@@ -9372,14 +9294,6 @@
             {
                 "name": "Spine.Pool$1.IPoolable",
                 "excluded": false
-            },
-            {
-                "name": "pc.Debugger.Components.EditorCamera",
-                "excluded": true
-            },
-            {
-                "name": "pc.Debugger.Components.EditorGUI",
-                "excluded": true
             }
         ],
         "unusedMethods": [
@@ -17887,7 +17801,7 @@
                     },
                     {
                         "name": "localEulerAngles#set",
-                        "excluded": false
+                        "excluded": true
                     },
                     {
                         "name": "eulerAngles#get",
@@ -18479,7 +18393,7 @@
                     },
                     {
                         "name": "fieldOfView#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "fieldOfView#set",
@@ -18543,7 +18457,7 @@
                     },
                     {
                         "name": "_aspect#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "_aspect#set",
@@ -18551,7 +18465,7 @@
                     },
                     {
                         "name": "aspect#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "aspect#set",
@@ -18559,7 +18473,7 @@
                     },
                     {
                         "name": "orthographicSize#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "orthographicSize#set",
@@ -18687,7 +18601,7 @@
                     },
                     {
                         "name": "WorldToScreenPoint",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "ScreenToWorldPoint",
@@ -18707,7 +18621,7 @@
                     },
                     {
                         "name": "WorldToViewportPoint",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "ScreenToViewportPoint",
@@ -18719,7 +18633,7 @@
                     },
                     {
                         "name": "ViewportToWorldPoint",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "ViewportPointToRay",
@@ -23598,28 +23512,6 @@
                 ]
             },
             {
-                "className": "ComponentCache$1",
-                "staticMethods": [],
-                "instanceMethods": [
-                    {
-                        "name": "init",
-                        "excluded": true
-                    },
-                    {
-                        "name": "Get$1",
-                        "excluded": true
-                    },
-                    {
-                        "name": "Get",
-                        "excluded": true
-                    },
-                    {
-                        "name": "ClearCache",
-                        "excluded": true
-                    }
-                ]
-            },
-            {
                 "className": "Ply_Singleton$1",
                 "staticMethods": [],
                 "instanceMethods": [
@@ -23995,7 +23887,7 @@
                 "instanceMethods": [
                     {
                         "name": "getDefaultValue",
-                        "excluded": false
+                        "excluded": true
                     },
                     {
                         "name": "Current#get",
@@ -24043,7 +23935,7 @@
                     },
                     {
                         "name": "$clone",
-                        "excluded": false
+                        "excluded": true
                     }
                 ]
             },
@@ -27025,7 +26917,7 @@
                     },
                     {
                         "name": "bounds#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "bounds#set",
@@ -32957,7 +32849,7 @@
                     },
                     {
                         "name": "GotoStore",
-                        "excluded": true
+                        "excluded": false
                     }
                 ]
             },
@@ -32983,6 +32875,78 @@
                     },
                     {
                         "name": "$clone",
+                        "excluded": true
+                    }
+                ]
+            },
+            {
+                "className": "ProgressTrackingManager",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "init",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Awake",
+                        "excluded": false
+                    },
+                    {
+                        "name": "AddProgress",
+                        "excluded": false
+                    },
+                    {
+                        "name": "UpdateGameProgress",
+                        "excluded": false
+                    }
+                ]
+            },
+            {
+                "className": "ScreenHeightPositionAnchor",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "init",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Awake",
+                        "excluded": false
+                    },
+                    {
+                        "name": "OnEnable",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Start",
+                        "excluded": false
+                    },
+                    {
+                        "name": "LateUpdate",
+                        "excluded": false
+                    },
+                    {
+                        "name": "AlignToScreenHeightRatio",
+                        "excluded": false
+                    },
+                    {
+                        "name": "GetTargetCamera",
+                        "excluded": false
+                    },
+                    {
+                        "name": "GetAnchor",
+                        "excluded": false
+                    },
+                    {
+                        "name": "CacheScreenState",
+                        "excluded": false
+                    },
+                    {
+                        "name": "HasCameraChanged",
+                        "excluded": false
+                    },
+                    {
+                        "name": "OnDrawGizmos",
                         "excluded": true
                     }
                 ]
@@ -33798,6 +33762,52 @@
                     {
                         "name": "Deserialize",
                         "excluded": false
+                    }
+                ]
+            },
+            {
+                "className": "Spine.MathUtils",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "init",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Sin",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Cos",
+                        "excluded": true
+                    },
+                    {
+                        "name": "SinDeg",
+                        "excluded": true
+                    },
+                    {
+                        "name": "CosDeg",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Atan2Deg",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Atan2",
+                        "excluded": true
+                    },
+                    {
+                        "name": "Clamp",
+                        "excluded": true
+                    },
+                    {
+                        "name": "RandomTriangle",
+                        "excluded": true
+                    },
+                    {
+                        "name": "RandomTriangle$1",
+                        "excluded": true
                     }
                 ]
             },
@@ -34993,7 +35003,7 @@
                     },
                     {
                         "name": "getDefaultValue",
-                        "excluded": false
+                        "excluded": true
                     },
                     {
                         "name": "ctor",
@@ -35245,10 +35255,18 @@
                     },
                     {
                         "name": "OnDisable",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "OnSkeletonRebuild",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Awake",
+                        "excluded": false
+                    },
+                    {
+                        "name": "Update",
                         "excluded": false
                     },
                     {
@@ -35288,11 +35306,15 @@
                         "excluded": true
                     },
                     {
-                        "name": "Update",
+                        "name": "RefreshSkeletonAndRender",
                         "excluded": false
                     },
                     {
-                        "name": "OnSpineMeshUpdated",
+                        "name": "LateUpdate",
+                        "excluded": false
+                    },
+                    {
+                        "name": "ApplyLunaSafeSettings",
                         "excluded": false
                     }
                 ]
@@ -35737,7 +35759,7 @@
                     },
                     {
                         "name": "TimelineAttachment#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "TimelineAttachment#set",
@@ -37379,7 +37401,7 @@
                     },
                     {
                         "name": "OnDisable",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "OnDestroy",
@@ -37603,7 +37625,7 @@
                     },
                     {
                         "name": "addUpdateComplete",
-                        "excluded": false
+                        "excluded": true
                     },
                     {
                         "name": "removeUpdateComplete",
@@ -38070,66 +38092,6 @@
                 ]
             },
             {
-                "className": "UnityEngine.EventSystems.RaycasterManager",
-                "staticMethods": [],
-                "instanceMethods": [
-                    {
-                        "name": "init",
-                        "excluded": false
-                    },
-                    {
-                        "name": "AddRaycaster",
-                        "excluded": true
-                    },
-                    {
-                        "name": "GetRaycasters",
-                        "excluded": false
-                    },
-                    {
-                        "name": "RemoveRaycasters",
-                        "excluded": true
-                    }
-                ]
-            },
-            {
-                "className": "UnityEngine.EventSystems.BaseRaycaster",
-                "staticMethods": [],
-                "instanceMethods": [
-                    {
-                        "name": "renderOrderPriority#get",
-                        "excluded": true
-                    },
-                    {
-                        "name": "sortOrderPriority#get",
-                        "excluded": true
-                    },
-                    {
-                        "name": "rootRaycaster#get",
-                        "excluded": true
-                    },
-                    {
-                        "name": "ConfigureForEntity",
-                        "excluded": true
-                    },
-                    {
-                        "name": "OnEnable",
-                        "excluded": true
-                    },
-                    {
-                        "name": "OnDisable",
-                        "excluded": true
-                    },
-                    {
-                        "name": "OnCanvasHierarchyChanged",
-                        "excluded": true
-                    },
-                    {
-                        "name": "OnTransformParentChanged",
-                        "excluded": true
-                    }
-                ]
-            },
-            {
                 "className": "UnityEngine.Collider",
                 "staticMethods": [],
                 "instanceMethods": [
@@ -38521,6 +38483,66 @@
                     },
                     {
                         "name": "ctor",
+                        "excluded": true
+                    }
+                ]
+            },
+            {
+                "className": "UnityEngine.EventSystems.RaycasterManager",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "init",
+                        "excluded": false
+                    },
+                    {
+                        "name": "AddRaycaster",
+                        "excluded": true
+                    },
+                    {
+                        "name": "GetRaycasters",
+                        "excluded": false
+                    },
+                    {
+                        "name": "RemoveRaycasters",
+                        "excluded": true
+                    }
+                ]
+            },
+            {
+                "className": "UnityEngine.EventSystems.BaseRaycaster",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "renderOrderPriority#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "sortOrderPriority#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "rootRaycaster#get",
+                        "excluded": true
+                    },
+                    {
+                        "name": "ConfigureForEntity",
+                        "excluded": true
+                    },
+                    {
+                        "name": "OnEnable",
+                        "excluded": true
+                    },
+                    {
+                        "name": "OnDisable",
+                        "excluded": true
+                    },
+                    {
+                        "name": "OnCanvasHierarchyChanged",
+                        "excluded": true
+                    },
+                    {
+                        "name": "OnTransformParentChanged",
                         "excluded": true
                     }
                 ]
@@ -39078,28 +39100,6 @@
                 ]
             },
             {
-                "className": "ProgressTrackingManager",
-                "staticMethods": [],
-                "instanceMethods": [
-                    {
-                        "name": "init",
-                        "excluded": false
-                    },
-                    {
-                        "name": "Awake",
-                        "excluded": false
-                    },
-                    {
-                        "name": "AddProgress",
-                        "excluded": true
-                    },
-                    {
-                        "name": "UpdateGameProgress",
-                        "excluded": true
-                    }
-                ]
-            },
-            {
                 "className": "UnityEngine.ContextMenu",
                 "staticMethods": [],
                 "instanceMethods": [
@@ -39118,7 +39118,7 @@
                 ]
             },
             {
-                "className": "UnityEngine.HeaderAttribute",
+                "className": "UnityEngine.RangeAttribute",
                 "staticMethods": [],
                 "instanceMethods": [
                     {
@@ -39193,266 +39193,6 @@
                         "script": "",
                         "ext": "",
                         "name": "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset"
-                    },
-                    {
-                        "maxWidth": 250,
-                        "maxHeight": 250,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/2_0.png"
-                    },
-                    {
-                        "maxWidth": 250,
-                        "maxHeight": 250,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/ball_lor_0.png"
-                    },
-                    {
-                        "maxWidth": 180,
-                        "maxHeight": 159,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/shirt_kpop_3.png"
-                    },
-                    {
-                        "maxWidth": 4096,
-                        "maxHeight": 4096,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/MySpine/left_or_right_new.png"
-                    },
-                    {
-                        "maxWidth": 230,
-                        "maxHeight": 147,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/skirt_kuromi.png"
-                    },
-                    {
-                        "maxWidth": 338,
-                        "maxHeight": 413,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/border_gold.png"
-                    },
-                    {
-                        "maxWidth": 230,
-                        "maxHeight": 145,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/skirt5.png"
-                    },
-                    {
-                        "maxWidth": 1080,
-                        "maxHeight": 1920,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/BG/BG IN GAME 1.png"
-                    },
-                    {
-                        "maxWidth": 154,
-                        "maxHeight": 200,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/shoe10.png"
-                    },
-                    {
-                        "maxWidth": 180,
-                        "maxHeight": 184,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/shirt 26.png"
-                    },
-                    {
-                        "maxWidth": 626,
-                        "maxHeight": 1141,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/ghe_2.png"
-                    },
-                    {
-                        "maxWidth": 316,
-                        "maxHeight": 250,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Chung/goobjob.png"
-                    },
-                    {
-                        "maxWidth": 400,
-                        "maxHeight": 162,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Chung/graet.png"
-                    },
-                    {
-                        "maxWidth": 130,
-                        "maxHeight": 210,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/acc_kpop_2.png"
-                    },
-                    {
-                        "maxWidth": 152,
-                        "maxHeight": 180,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/shoe_kuromi.png"
-                    },
-                    {
-                        "maxWidth": 303,
-                        "maxHeight": 226,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Chung/oh yeah.png"
-                    },
-                    {
-                        "maxWidth": 126,
-                        "maxHeight": 210,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/acc_kpop_3.png"
-                    },
-                    {
-                        "maxWidth": 128,
-                        "maxHeight": 128,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/eyes_icon.png"
-                    },
-                    {
-                        "maxWidth": 128,
-                        "maxHeight": 128,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/shoes_icon.png"
-                    },
-                    {
-                        "maxWidth": 43,
-                        "maxHeight": 43,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/greenTick.png"
-                    },
-                    {
-                        "maxWidth": 128,
-                        "maxHeight": 128,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/acc_icon.png"
-                    },
-                    {
-                        "maxWidth": 128,
-                        "maxHeight": 128,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/shirt_icon.png"
-                    },
-                    {
-                        "maxWidth": 128,
-                        "maxHeight": 128,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/skirt_icon.png"
-                    },
-                    {
-                        "maxWidth": 336,
-                        "maxHeight": 413,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/border_white.png"
-                    },
-                    {
-                        "maxWidth": 336,
-                        "maxHeight": 413,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sprite/Other/WhiteCard.png"
-                    },
-                    {
-                        "maxWidth": 4096,
-                        "maxHeight": 4096,
-                        "format": "png32",
-                        "compression": "quantSize",
-                        "quality": 65,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/MySpine/left_or_right_new_2.png"
                     }
                 ]
             },
@@ -39462,42 +39202,11 @@
                     "startTime": "00:00.000",
                     "endTime": "00:00.000",
                     "lengthInSeconds": 0.0,
-                    "bitrate": 64,
+                    "bitrate": 128,
                     "script": "",
                     "ext": ""
                 },
-                "overrides": [
-                    {
-                        "channels": 1,
-                        "startTime": "00:00.000",
-                        "endTime": "00:30.000",
-                        "lengthInSeconds": 30.0,
-                        "bitrate": 64,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sound/bgm/bgm1.mp3"
-                    },
-                    {
-                        "channels": 1,
-                        "startTime": "00:00.000",
-                        "endTime": "00:30.000",
-                        "lengthInSeconds": 30.0,
-                        "bitrate": 64,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sound/Left (mp3cut.net).mp3"
-                    },
-                    {
-                        "channels": 1,
-                        "startTime": "00:00.000",
-                        "endTime": "00:00.000",
-                        "lengthInSeconds": 0.0,
-                        "bitrate": 64,
-                        "script": "",
-                        "ext": "",
-                        "name": "Assets/_Game/Sound/Right.mp3"
-                    }
-                ]
+                "overrides": []
             },
             "font": {
                 "default": {
