@@ -37,6 +37,7 @@ SpriteAtlas:
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
+    - 186291907d87c534f9a48f28952e4e90: 21300000
     - be2a2b013d1435841a8d579e51108e3f: 21300000
     - 69dd7f4125d52ad4a8817f109f055042: 21300000
     - 2f0e1951585ce73478912beb2919e9fd: 21300000
@@ -46,7 +47,8 @@ SpriteAtlas:
     - ae94be335e9abda4693b59f281478f50: 21300000
     - 563c59f39947bbd41992d6eed475fee1: 21300000
     - 21ed4d04fc10243449e4f61fffb60fea: 7482667652216324306
-    - a2f83324d6326da4992981ef8d2dcc36: 21300000
+    - ec826364dc3c2164ea77be534943f35b: 21300000
+    - 7e06866481925504f969dc2a2f5193c8: 21300000
     - 4ab879b44eb0b08479459f3bb7392004: 21300000
     - fcc59ff4ac98eb649add82e9613a0229: 21300000
     - c39e110512afcce4997ca5c8d2360ab9: 21300000
@@ -64,13 +66,11 @@ SpriteAtlas:
     - 0439e597db3657d499834ac5023f95f0: 21300000
     - df0d59889d3e164429b0aab007413fee: 21300000
     - 432e8699ce5a4da488dee10aa5d3383f: -105918840
-    - 894d79e930c42fe47b1f1f9703f65bb3: 21300000
     - db1413f9cc124e345a3e6ce436d78913: 21300000
-    - b6469a5ad01ddc7409e05d557950ad20: 21300000
     - c0883c9a3b169ae42a3f10f54517fbbe: 21300000
-    - a0464f6b58e098848b8fddf8994cb5c1: 21300000
+    - fdd9193b1de48a148a3104913b7b2231: 21300000
     - fa4d2bcb9337a3148a88981b5ee8e569: 21300000
-    - d386e5db215f61b4dacd181727169a3d: 21300000
+    - 6bfce19cc51ccbe4eb86725924f1ba73: 21300000
     - 0686089cc58b60f4cbdc3425f6593f2b: 21300000
     - 3cca66ac08c6c374a99b93e5a2d32c7d: 21300000
     - 601995bc74a6a544f93f12a63dc6450e: 21300000
@@ -85,6 +85,7 @@ SpriteAtlas:
     - bff26bdf997d6cf48a2a792be3fcfc18: 21300000
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
+  - {fileID: 21300000, guid: 186291907d87c534f9a48f28952e4e90, type: 3}
   - {fileID: 21300000, guid: be2a2b013d1435841a8d579e51108e3f, type: 3}
   - {fileID: 21300000, guid: 69dd7f4125d52ad4a8817f109f055042, type: 3}
   - {fileID: 21300000, guid: 2f0e1951585ce73478912beb2919e9fd, type: 3}
@@ -94,7 +95,8 @@ SpriteAtlas:
   - {fileID: 21300000, guid: ae94be335e9abda4693b59f281478f50, type: 3}
   - {fileID: 21300000, guid: 563c59f39947bbd41992d6eed475fee1, type: 3}
   - {fileID: 7482667652216324306, guid: 21ed4d04fc10243449e4f61fffb60fea, type: 3}
-  - {fileID: 21300000, guid: a2f83324d6326da4992981ef8d2dcc36, type: 3}
+  - {fileID: 21300000, guid: ec826364dc3c2164ea77be534943f35b, type: 3}
+  - {fileID: 21300000, guid: 7e06866481925504f969dc2a2f5193c8, type: 3}
   - {fileID: 21300000, guid: 4ab879b44eb0b08479459f3bb7392004, type: 3}
   - {fileID: 21300000, guid: fcc59ff4ac98eb649add82e9613a0229, type: 3}
   - {fileID: 21300000, guid: c39e110512afcce4997ca5c8d2360ab9, type: 3}
@@ -112,13 +114,11 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 0439e597db3657d499834ac5023f95f0, type: 3}
   - {fileID: 21300000, guid: df0d59889d3e164429b0aab007413fee, type: 3}
   - {fileID: -105918840, guid: 432e8699ce5a4da488dee10aa5d3383f, type: 3}
-  - {fileID: 21300000, guid: 894d79e930c42fe47b1f1f9703f65bb3, type: 3}
   - {fileID: 21300000, guid: db1413f9cc124e345a3e6ce436d78913, type: 3}
-  - {fileID: 21300000, guid: b6469a5ad01ddc7409e05d557950ad20, type: 3}
   - {fileID: 21300000, guid: c0883c9a3b169ae42a3f10f54517fbbe, type: 3}
-  - {fileID: 21300000, guid: a0464f6b58e098848b8fddf8994cb5c1, type: 3}
+  - {fileID: 21300000, guid: fdd9193b1de48a148a3104913b7b2231, type: 3}
   - {fileID: 21300000, guid: fa4d2bcb9337a3148a88981b5ee8e569, type: 3}
-  - {fileID: 21300000, guid: d386e5db215f61b4dacd181727169a3d, type: 3}
+  - {fileID: 21300000, guid: 6bfce19cc51ccbe4eb86725924f1ba73, type: 3}
   - {fileID: 21300000, guid: 0686089cc58b60f4cbdc3425f6593f2b, type: 3}
   - {fileID: 21300000, guid: 3cca66ac08c6c374a99b93e5a2d32c7d, type: 3}
   - {fileID: 21300000, guid: 601995bc74a6a544f93f12a63dc6450e, type: 3}
@@ -132,6 +132,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 4f082bdf76524994ba30987d14242ee2, type: 3}
   - {fileID: 21300000, guid: bff26bdf997d6cf48a2a792be3fcfc18, type: 3}
   m_PackedSpriteNamesToIndex:
+  - Shirt_rw3
   - eyes_icon
   - CircleFillWhite (1) (1)
   - graet
@@ -141,7 +142,8 @@ SpriteAtlas:
   - emoji-heart-1
   - emoji-heart-2
   - Square
-  - acc_kpop_2
+  - skirt_rw3
+  - shoe_rw3
   - hair_icon
   - ball_lor_0
   - ghe_2
@@ -159,13 +161,11 @@ SpriteAtlas:
   - Hand_Drag
   - shoe10
   - Button_0
-  - skirt5
   - emoji-heart-3
-  - shoe_kuromi
   - oh yeah
-  - shirt 26
+  - acc_rw3_hat color
   - greenTick
-  - acc_kpop_3
+  - acc_kuromi
   - inkpx-word-art (1)
   - table
   - shoes_icon
