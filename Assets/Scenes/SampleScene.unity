@@ -369,12 +369,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 50
-  m_Sprite: {fileID: 21300000, guid: ec826364dc3c2164ea77be534943f35b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ef6f52e5176da194cb475e4fbc75cd00, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.9, y: 1.69}
+  m_Size: {x: 1.71, y: 1.36}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -521,10 +521,10 @@ MonoBehaviour:
   - isEnabled: 0
     skinName: hair/hair_haloween4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: hair/hair_Kpop_1
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     skinName: hair/hair_Kpop_3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
@@ -533,10 +533,10 @@ MonoBehaviour:
   - isEnabled: 0
     skinName: shirt/shirt_christmast_6
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: shirt/shirt_haloween4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     skinName: shirt/shirt_Kpop_3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
@@ -545,19 +545,19 @@ MonoBehaviour:
   - isEnabled: 0
     skinName: shoe/shoe_christmast_6
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: shoe/shoe_haloween4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     skinName: shoe/shoe_Kpop_3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     skinName: shoe/shoe_rw_ad3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     skinName: skirt/skirt_christmast_6
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: skirt/skirt_haloween4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 1
@@ -1103,10 +1103,9 @@ MonoBehaviour:
   - leg_white
   - white
   - face/face_Kpop_3
-  - hair/hair_Kpop_1
-  - shirt/shirt_haloween4
-  - shoe/shoe_haloween4
-  - skirt/skirt_haloween4
+  - hair/hair_Kpop_3
+  - shirt/shirt_Kpop_3
+  - shoe/shoe_rw_ad3
   - skirt/skirt_Kpop_3
   - skirt/skirt_rw_ad3
 --- !u!114 &594413119
@@ -1182,7 +1181,6 @@ MeshRenderer:
   - {fileID: 2100000, guid: 8cb5eaf4ccdf2db4789f9dc25e223357, type: 2}
   - {fileID: 2100000, guid: b81aa4a488de2a04790ad78f273eae4f, type: 2}
   - {fileID: 2100000, guid: 8cb5eaf4ccdf2db4789f9dc25e223357, type: 2}
-  - {fileID: 2100000, guid: b81aa4a488de2a04790ad78f273eae4f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2413,9 +2411,8 @@ MonoBehaviour:
   currentAppliedSkinNames:
   - leg_white
   - white
-  - accessories/acc_rw_ad3
-  - face/face_rw_ad3
-  - hair/hair_rw_ad3
+  - face/face_haloween4
+  - hair/hair_haloween4
 --- !u!114 &1174178229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4557,12 +4554,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 50
-  m_Sprite: {fileID: 21300000, guid: d72d9ba152532d447a8f8c472a9d9d03, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9797806735193ec45a4224dd20fff1e5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.27, y: 1.45}
+  m_Size: {x: 3.07, y: 4.62}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
