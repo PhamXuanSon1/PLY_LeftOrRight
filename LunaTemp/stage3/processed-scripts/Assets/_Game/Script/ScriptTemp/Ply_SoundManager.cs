@@ -10,7 +10,8 @@ public enum FxType
 {
     Left,
     Right,
-    Yeah
+    Yeah,
+    Click
 }
 
 [System.Serializable]
@@ -26,6 +27,7 @@ public class FxAudio
     public SoundData Left;
     public SoundData Right;
     public SoundData Yeah;
+    public SoundData Click;
 }
 
 public class Ply_SoundManager : Ply_Singleton<Ply_SoundManager>
@@ -100,6 +102,7 @@ public class Ply_SoundManager : Ply_Singleton<Ply_SoundManager>
             case FxType.Left: return fxAudio.Left;
             case FxType.Right: return fxAudio.Right;
             case FxType.Yeah: return fxAudio.Yeah;
+            case FxType.Click: return fxAudio.Click;
             default: return null;
         }
     }

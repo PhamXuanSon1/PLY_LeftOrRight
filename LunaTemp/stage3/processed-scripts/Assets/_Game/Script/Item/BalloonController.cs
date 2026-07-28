@@ -48,6 +48,12 @@ public class BalloonController : MonoBehaviour
                     {
                         isAnimating = true;
 
+                        // Play sound click
+                        if (Ply_SoundManager.Ins != null)
+                        {
+                            Ply_SoundManager.Ins.PlayFx(FxType.Click);
+                        }
+
                         // Kích hoạt sự kiện click (Ví dụ: để gọi PlayAnimation)
                         onBalloonClicked?.Invoke();
 
@@ -71,6 +77,16 @@ public class BalloonController : MonoBehaviour
                         // Animation bay đến Slot, SAU ĐÓ mới Scale về 0
                         Sequence seq = DOTween.Sequence();
                         seq.Append(itemTransform.DOMove(targetPos, flyDuration).SetEase(Ease.InOutQuad));
+                        
+                        // Khi bay đến slot xong thì play sound Yeah
+                        seq.AppendCallback(() => 
+                        {
+                            if (Ply_SoundManager.Ins != null)
+                            {
+                                Ply_SoundManager.Ins.PlayFx(FxType.Yeah);
+                            }
+                        });
+
                         seq.Append(itemTransform.DOScale(Vector3.zero, scaleDuration).SetEase(Ease.InBack));
                         seq.AppendInterval(delayBeforeNextSlot);
 
