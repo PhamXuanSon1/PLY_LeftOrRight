@@ -374,7 +374,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.71, y: 1.36}
+  m_Size: {x: 6.41, y: 5.92}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1284,8 +1284,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: c2ebba18523e93b429b87ea849e8da3e, type: 3}
-  m_Resource: {fileID: 8300000, guid: c2ebba18523e93b429b87ea849e8da3e, type: 3}
+  m_audioClip: {fileID: 8300000, guid: dd8a57995524595408c5a36cbc56777e, type: 3}
+  m_Resource: {fileID: 8300000, guid: dd8a57995524595408c5a36cbc56777e, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.3
   m_Pitch: 1
@@ -4554,12 +4554,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 50
-  m_Sprite: {fileID: 21300000, guid: 9797806735193ec45a4224dd20fff1e5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 53938d268cc368c4cbe46f41a0279feb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 3.07, y: 4.62}
+  m_Size: {x: 2.99, y: 1.92}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

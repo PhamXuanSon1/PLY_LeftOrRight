@@ -38,6 +38,7 @@ SpriteAtlas:
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
     - e291de30850696249a6157a20b6c09dd: 21300000
+    - c3567d60ad654bb4880e748c033f028c: 21300000
     - be2a2b013d1435841a8d579e51108e3f: 21300000
     - 69dd7f4125d52ad4a8817f109f055042: 21300000
     - 2f0e1951585ce73478912beb2919e9fd: 21300000
@@ -47,7 +48,6 @@ SpriteAtlas:
     - 3abc6c5376a81d543ab0d2ae9f160eb0: 21300000
     - 563c59f39947bbd41992d6eed475fee1: 21300000
     - 21ed4d04fc10243449e4f61fffb60fea: 7482667652216324306
-    - ec826364dc3c2164ea77be534943f35b: 21300000
     - 4ab879b44eb0b08479459f3bb7392004: 21300000
     - fcc59ff4ac98eb649add82e9613a0229: 21300000
     - c39e110512afcce4997ca5c8d2360ab9: 21300000
@@ -55,6 +55,7 @@ SpriteAtlas:
     - 9871f885648cdc44a87f6df103518116: 1609524865
     - ef6f52e5176da194cb475e4fbc75cd00: 21300000
     - ba27d6260b6a1b74fb84e181e335d231: 21300000
+    - 53938d268cc368c4cbe46f41a0279feb: 21300000
     - 5f8db736b14abc345bae573d83fb295c: 21300000
     - 476fc066ad4d2ac4eb082f8072763f0f: -526608802
     - 476fc066ad4d2ac4eb082f8072763f0f: 757631854
@@ -62,7 +63,6 @@ SpriteAtlas:
     - 476fc066ad4d2ac4eb082f8072763f0f: -1720640722
     - 7d5aa927ea8527148a2d63e5770c2357: 21300000
     - f5383747db97f454884f73d6e847a276: 21300000
-    - 9797806735193ec45a4224dd20fff1e5: 21300000
     - 0439e597db3657d499834ac5023f95f0: 21300000
     - 7b6e5e48847dee842a0b652a201f0181: 21300000
     - 43da848917c915942a23ac77458b33aa: 21300000
@@ -86,6 +86,7 @@ SpriteAtlas:
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: e291de30850696249a6157a20b6c09dd, type: 3}
+  - {fileID: 21300000, guid: c3567d60ad654bb4880e748c033f028c, type: 3}
   - {fileID: 21300000, guid: be2a2b013d1435841a8d579e51108e3f, type: 3}
   - {fileID: 21300000, guid: 69dd7f4125d52ad4a8817f109f055042, type: 3}
   - {fileID: 21300000, guid: 2f0e1951585ce73478912beb2919e9fd, type: 3}
@@ -95,7 +96,6 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 3abc6c5376a81d543ab0d2ae9f160eb0, type: 3}
   - {fileID: 21300000, guid: 563c59f39947bbd41992d6eed475fee1, type: 3}
   - {fileID: 7482667652216324306, guid: 21ed4d04fc10243449e4f61fffb60fea, type: 3}
-  - {fileID: 21300000, guid: ec826364dc3c2164ea77be534943f35b, type: 3}
   - {fileID: 21300000, guid: 4ab879b44eb0b08479459f3bb7392004, type: 3}
   - {fileID: 21300000, guid: fcc59ff4ac98eb649add82e9613a0229, type: 3}
   - {fileID: 21300000, guid: c39e110512afcce4997ca5c8d2360ab9, type: 3}
@@ -103,6 +103,7 @@ SpriteAtlas:
   - {fileID: 1609524865, guid: 9871f885648cdc44a87f6df103518116, type: 3}
   - {fileID: 21300000, guid: ef6f52e5176da194cb475e4fbc75cd00, type: 3}
   - {fileID: 21300000, guid: ba27d6260b6a1b74fb84e181e335d231, type: 3}
+  - {fileID: 21300000, guid: 53938d268cc368c4cbe46f41a0279feb, type: 3}
   - {fileID: 21300000, guid: 5f8db736b14abc345bae573d83fb295c, type: 3}
   - {fileID: -526608802, guid: 476fc066ad4d2ac4eb082f8072763f0f, type: 3}
   - {fileID: 757631854, guid: 476fc066ad4d2ac4eb082f8072763f0f, type: 3}
@@ -110,7 +111,6 @@ SpriteAtlas:
   - {fileID: -1720640722, guid: 476fc066ad4d2ac4eb082f8072763f0f, type: 3}
   - {fileID: 21300000, guid: 7d5aa927ea8527148a2d63e5770c2357, type: 3}
   - {fileID: 21300000, guid: f5383747db97f454884f73d6e847a276, type: 3}
-  - {fileID: 21300000, guid: 9797806735193ec45a4224dd20fff1e5, type: 3}
   - {fileID: 21300000, guid: 0439e597db3657d499834ac5023f95f0, type: 3}
   - {fileID: 21300000, guid: 7b6e5e48847dee842a0b652a201f0181, type: 3}
   - {fileID: 21300000, guid: 43da848917c915942a23ac77458b33aa, type: 3}
@@ -133,6 +133,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: bff26bdf997d6cf48a2a792be3fcfc18, type: 3}
   m_PackedSpriteNamesToIndex:
   - shoe_spranky_2
+  - skirt 15
   - eyes_icon
   - CircleFillWhite (1) (1)
   - graet
@@ -142,7 +143,6 @@ SpriteAtlas:
   - shirt 26
   - emoji-heart-2
   - Square
-  - skirt_rw3
   - hair_icon
   - ball_lor_0
   - ghe_2
@@ -150,6 +150,7 @@ SpriteAtlas:
   - arrow-slide_0
   - acc7_headphone
   - 09
+  - acc_fairy_1
   - logo game (1)
   - Dust01_3
   - Dust01_2
@@ -157,7 +158,6 @@ SpriteAtlas:
   - Dust01_0
   - border_white
   - WhiteCard
-  - acc5_hat cat
   - Hand_Drag
   - skirt_spranky_2
   - shoe6

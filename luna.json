@@ -2,7 +2,7 @@
     "version": "7.1.0",
     "projectId": "a6751afac85ec2744a912b2a685dda8d",
     "applicationID": 33393,
-    "creativeName": "LeftOrRight_Ply2",
+    "creativeName": "LeftOrRight_Ply3",
     "pgServer": "EU",
     "window": {
         "‐⁙": true
@@ -39288,6 +39288,16 @@
                         "script": "",
                         "ext": "",
                         "name": "Assets/_Game/Sound/Yeah (mp3cut.net) (2).mp3"
+                    },
+                    {
+                        "channels": 1,
+                        "startTime": "00:00.000",
+                        "endTime": "00:30.000",
+                        "lengthInSeconds": 30.0,
+                        "bitrate": 64,
+                        "script": "",
+                        "ext": "",
+                        "name": "Assets/_Game/Sound/bgm/Lady Gaga - Bloody Mary (TikTok Remix Speed Up) Wednesday Dance Scene - itsAirLow (youtube) (mp3cut.net).mp3"
                     }
                 ]
             },

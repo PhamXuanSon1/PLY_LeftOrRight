@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slotName: Slot2
   leftItemSprite: {fileID: 21300000, guid: 7b6e5e48847dee842a0b652a201f0181, type: 3}
-  rightItemSprite: {fileID: 21300000, guid: ec826364dc3c2164ea77be534943f35b, type: 3}
+  rightItemSprite: {fileID: 21300000, guid: c3567d60ad654bb4880e748c033f028c, type: 3}
