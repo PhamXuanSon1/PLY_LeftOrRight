@@ -54,23 +54,9 @@ public static class CharacterEditorReapply
             return;
         }
 
-        var skinNamesField = typeof(Character).GetField("currentAppliedSkinNames",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var pairsField = typeof(Character).GetField("currentAppliedPairs",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        List<string> skinNames = null;
-        List<SlotAttachmentPair> pairs = null;
-
-        if (skinNamesField != null)
-            skinNames = skinNamesField.GetValue(activeCharacter) as List<string>;
-        
-        if (pairsField != null)
-            pairs = pairsField.GetValue(activeCharacter) as List<SlotAttachmentPair>;
-
-        if ((skinNames != null && skinNames.Count > 0) || (pairs != null && pairs.Count > 0))
+        if (activeCharacter.HasEquipmentToReapply)
         {
-            activeCharacter.MixSkinsAndAttachments(skinNames, pairs);
+            activeCharacter.ReapplyCurrentEquipment();
             activeCharacter.SkeletonAnimation.LateUpdate();
             if (reapplyCounter <= 0) SceneView.RepaintAll();
         }

@@ -47,8 +47,27 @@ public class CharacterManager : MonoBehaviour
     [Title("Danh Sách Skin Đang Chọn (Base)")]
     [InfoBox("Tick vào các Skin nền tảng bạn muốn mặc cho nhân vật. Có thể chọn nhiều Skin cùng lúc (mix).")]
     [ListDrawerSettings(ShowFoldout = true)]
-    [Searchable]
+    [Searchable(FilterOptions = SearchFilterOptions.ISearchFilterableInterface)]
     public List<SkinToggleEntry> mySkinSet = new List<SkinToggleEntry>();
+
+    // ===== DANH SÁCH OVERRIDE TỪNG SLOT =====
+    [Title("Override Từng Slot (Đè Lên Skin)")]
+    [InfoBox("Mỗi dòng = lấy 1 Skin Placeholder từ 1 Skin nguồn rồi đắp lên 1 slot.\n" +
+             "Tick = ép mặc placeholder đó lên slot (kể cả Skin nền không có).\n" +
+             "Bỏ tick + CÓ placeholder = ép TẮT slot đó (khoét bớt Skin nền).\n" +
+             "Bỏ tick + TRỐNG placeholder = bỏ qua dòng, slot giữ nguyên theo Skin nền.\n" +
+             "LƯU Ý: file Spine này có nhiều placeholder trùng tên ở nhiều Skin (face, head, hair1/front_Hair...) " +
+             "nên BẮT BUỘC phải điền Skin Nguồn.\n\n" +
+             "TÌM KIẾM (ô Search ngay trên bảng):\n" +
+             "   hair                 → tìm ở cả Skin, Slot, Placeholder\n" +
+             "   skin:hair_Kpop_3     → chỉ lọc theo Skin nguồn\n" +
+             "   slot:head            → chỉ lọc theo Slot\n" +
+             "   ph:front_Hair        → chỉ lọc theo Placeholder\n" +
+             "   on / off             → lọc theo trạng thái tick\n" +
+             "   skin:shirt on        → nhiều từ khoá = phải khớp TẤT CẢ")]
+    [TableList(ShowIndexLabels = true)]
+    [Searchable(FilterOptions = SearchFilterOptions.ISearchFilterableInterface)]
+    public List<SlotAttachmentPair> myAttachmentSet = new List<SlotAttachmentPair>();
 
 
 
@@ -115,7 +134,7 @@ public class CharacterManager : MonoBehaviour
     public void EquipCharacter(Character character, EquipmentSetData equipmentData)
     {
         if (character == null || equipmentData == null) return;
-        character.MixSkinsAndAttachments(equipmentData.skinNames, null);
+        character.MixSkinsAndAttachments(equipmentData.skinNames, equipmentData.attachmentPairs);
     }
 
     // Mặc đồ từ thông tin của ItemController (Hỗ trợ Item có nhiều part/slot)
@@ -126,7 +145,7 @@ public class CharacterManager : MonoBehaviour
         {
             var setup = item.itemAttachments[i];
             if (setup.characterSetup != null)
-                setup.characterSetup.TurnSlotAttachment(setup.slotName, setup.attachName);
+                setup.characterSetup.AddAttachmentOverride(setup.skinName, setup.slotName, setup.attachName, true);
         }
     }
 
@@ -197,6 +216,209 @@ public class CharacterManager : MonoBehaviour
         Debug.Log($"Đã lấy {mySkinSet.Count} skin từ skeleton.");
     }
 
+    // ===== NÚT TÁCH 1 SKIN THÀNH TỪNG PHẦN =====
+    [Title("Tách Skin Thành Từng Phần")]
+    [InfoBox("Chọn 1 Skin rồi bấm nút: mỗi Skin Placeholder trong Skin đó thành 1 dòng ở bảng dưới.\n" +
+             "Sau đó XOÁ những dòng không muốn dùng (ví dụ bỏ dòng 'head' để không đè đầu).")]
+    [ValueDropdown("GetSkinChoices")]
+    [LabelText("Skin Cần Tách")]
+    public string skinToSplit;
+
+    [Button("Tách Skin Thành Các Dòng", ButtonSizes.Large)]
+    [GUIColor(0.2f, 0.6f, 0.9f)]
+    public void SplitSkinIntoParts()
+    {
+        var skeletonDataAsset = GetTargetSkeletonDataAsset();
+        if (skeletonDataAsset == null)
+        {
+            Debug.LogError("Chưa gán Target Test Character hoặc SkeletonAnimation chưa khởi tạo!");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(skinToSplit))
+        {
+            Debug.LogError("Chưa chọn Skin cần tách! Hãy chọn ở ô 'Skin Cần Tách' ngay phía trên nút này.");
+            return;
+        }
+
+        SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
+        if (skeletonData == null) return;
+
+        Skin skin = skeletonData.FindSkin(skinToSplit);
+        if (skin == null)
+        {
+            Debug.LogError($"Không tìm thấy Skin '{skinToSplit}'.");
+            return;
+        }
+
+        if (myAttachmentSet == null) myAttachmentSet = new List<SlotAttachmentPair>();
+
+        int added = 0;
+        foreach (Skin.SkinEntry entry in skin.Attachments)
+        {
+            string slotName = skeletonData.Slots.Items[entry.SlotIndex].Name;
+
+            // Đã có dòng cho slot này rồi thì cập nhật, chưa có thì thêm mới
+            bool exists = false;
+            for (int i = 0; i < myAttachmentSet.Count; i++)
+            {
+                if (myAttachmentSet[i] == null || myAttachmentSet[i].slotName != slotName) continue;
+
+                myAttachmentSet[i].isEnabled = true;
+                myAttachmentSet[i].skinName = skinToSplit;
+                myAttachmentSet[i].attachmentName = entry.Name;
+                myAttachmentSet[i].skeletonDataAsset = skeletonDataAsset;
+                exists = true;
+                break;
+            }
+            if (exists) continue;
+
+            myAttachmentSet.Add(new SlotAttachmentPair
+            {
+                isEnabled = true,
+                skinName = skinToSplit,
+                slotName = slotName,
+                attachmentName = entry.Name,
+                skeletonDataAsset = skeletonDataAsset
+            });
+            added++;
+        }
+
+        Debug.Log($"Đã tách Skin '{skinToSplit}' thành {added} dòng mới (tổng {myAttachmentSet.Count}).");
+    }
+
+    /// <summary>
+    /// Chỉ liệt kê Skin thật sự có hình. Bỏ 'default' và các Skin rỗng (ví dụ 'empty')
+    /// vì tách chúng ra sẽ không sinh được dòng nào.
+    /// </summary>
+    private IEnumerable<ValueDropdownItem<string>> GetSkinChoices()
+    {
+        var items = new List<ValueDropdownItem<string>>
+        {
+            new ValueDropdownItem<string>("(Chưa chọn)", string.Empty)
+        };
+
+        var skeletonDataAsset = GetTargetSkeletonDataAsset();
+        if (skeletonDataAsset == null) return items;
+
+        SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
+        if (skeletonData == null) return items;
+
+        for (int i = 0; i < skeletonData.Skins.Count; i++)
+        {
+            Skin skin = skeletonData.Skins.Items[i];
+            if (skin.Name == "default") continue;
+
+            int count = 0;
+            foreach (Skin.SkinEntry unused in skin.Attachments) count++;
+            if (count == 0) continue;
+
+            items.Add(new ValueDropdownItem<string>($"{skin.Name}  ({count} phần)", skin.Name));
+        }
+
+        return items;
+    }
+
+    [Button("Làm Mới Ảnh Preview", ButtonSizes.Medium)]
+    [GUIColor(0.8f, 0.8f, 1f)]
+    public void RefreshPreviews()
+    {
+        SlotAttachmentPair.ClearPreviewCache();
+        SkinToggleEntry.ClearPreviewCache();
+        Debug.Log("Đã xoá cache ảnh preview, Inspector sẽ dựng lại ảnh.");
+    }
+
+    // ===== DỌN BẢNG =====
+    [HorizontalGroup("CleanTable")]
+    [Button("Xoá Các Dòng Rỗng", ButtonSizes.Medium)]
+    [GUIColor(1f, 0.85f, 0.5f)]
+    public void RemoveEmptyRows()
+    {
+        if (myAttachmentSet == null) return;
+
+        int before = myAttachmentSet.Count;
+        for (int i = myAttachmentSet.Count - 1; i >= 0; i--)
+        {
+            var pair = myAttachmentSet[i];
+            if (pair == null || (!pair.isEnabled && string.IsNullOrEmpty(pair.attachmentName)))
+                myAttachmentSet.RemoveAt(i);
+        }
+
+        Debug.Log($"Đã xoá {before - myAttachmentSet.Count} dòng rỗng, còn lại {myAttachmentSet.Count} dòng.");
+    }
+
+    [HorizontalGroup("CleanTable")]
+    [Button("Sắp Xếp Theo Skin", ButtonSizes.Medium)]
+    [GUIColor(0.6f, 0.9f, 1f)]
+    public void SortRowsBySkin()
+    {
+        if (myAttachmentSet == null) return;
+
+        myAttachmentSet.Sort((a, b) =>
+        {
+            if (a == null) return b == null ? 0 : 1;
+            if (b == null) return -1;
+
+            int bySkin = string.Compare(a.skinName ?? string.Empty, b.skinName ?? string.Empty,
+                System.StringComparison.OrdinalIgnoreCase);
+            if (bySkin != 0) return bySkin;
+
+            return string.Compare(a.slotName ?? string.Empty, b.slotName ?? string.Empty,
+                System.StringComparison.OrdinalIgnoreCase);
+        });
+
+        Debug.Log($"Đã sắp xếp {myAttachmentSet.Count} dòng theo Skin nguồn.");
+    }
+
+    [HorizontalGroup("CleanTable")]
+    [Button("Xoá Sạch Bảng", ButtonSizes.Medium)]
+    [GUIColor(1f, 0.5f, 0.5f)]
+    public void ClearAttachmentTable()
+    {
+        int before = myAttachmentSet != null ? myAttachmentSet.Count : 0;
+        myAttachmentSet = new List<SlotAttachmentPair>();
+        Debug.Log($"Đã xoá sạch {before} dòng trong bảng override.");
+    }
+
+    private SkeletonDataAsset GetTargetSkeletonDataAsset()
+    {
+        if (targetTestCharacter == null || targetTestCharacter.SkeletonAnimation == null) return null;
+        return targetTestCharacter.SkeletonAnimation.SkeletonDataAsset;
+    }
+
+    private List<string> GetEnabledSkinNames()
+    {
+        var enabledSkins = new List<string>();
+        if (mySkinSet == null) return enabledSkins;
+
+        for (int i = 0; i < mySkinSet.Count; i++)
+        {
+            if (mySkinSet[i].isEnabled && !string.IsNullOrEmpty(mySkinSet[i].skinName))
+                enabledSkins.Add(mySkinSet[i].skinName);
+        }
+        return enabledSkins;
+    }
+
+    /// <summary>
+    /// Chỉ lấy các dòng thật sự có tác dụng: đã chọn slot VÀ (bật kèm attachment HOẶC tắt slot chủ động).
+    /// Dòng trống (chưa tick, chưa chọn attachment) được bỏ qua để không tắt oan slot của Skin nền.
+    /// </summary>
+    private List<SlotAttachmentPair> GetMeaningfulPairs()
+    {
+        var result = new List<SlotAttachmentPair>();
+        if (myAttachmentSet == null) return result;
+
+        for (int i = 0; i < myAttachmentSet.Count; i++)
+        {
+            var pair = myAttachmentSet[i];
+            if (pair == null || string.IsNullOrEmpty(pair.slotName)) continue;
+            if (!pair.isEnabled && string.IsNullOrEmpty(pair.attachmentName)) continue;
+
+            result.Add(pair);
+        }
+        return result;
+    }
+
     // ===== LƯU / TẢI =====
     [HorizontalGroup("SaveLoad")]
     [Button("Lưu vào Asset", ButtonSizes.Medium)]
@@ -211,17 +433,30 @@ public class CharacterManager : MonoBehaviour
 
         // Lưu Skin
         testEquipmentDataAsset.skinNames.Clear();
-        for (int i = 0; i < mySkinSet.Count; i++)
+        testEquipmentDataAsset.skinNames.AddRange(GetEnabledSkinNames());
+
+        // Lưu Override từng slot
+        var dataAsset = GetTargetSkeletonDataAsset();
+        if (dataAsset != null) testEquipmentDataAsset.targetSkeletonDataAsset = dataAsset;
+
+        testEquipmentDataAsset.attachmentPairs.Clear();
+        var meaningfulPairs = GetMeaningfulPairs();
+        for (int i = 0; i < meaningfulPairs.Count; i++)
         {
-            if (mySkinSet[i].isEnabled && !string.IsNullOrEmpty(mySkinSet[i].skinName))
+            testEquipmentDataAsset.attachmentPairs.Add(new SlotAttachmentPair
             {
-                testEquipmentDataAsset.skinNames.Add(mySkinSet[i].skinName);
-            }
+                isEnabled = meaningfulPairs[i].isEnabled,
+                skinName = meaningfulPairs[i].skinName,
+                slotName = meaningfulPairs[i].slotName,
+                attachmentName = meaningfulPairs[i].attachmentName,
+                skeletonDataAsset = dataAsset
+            });
         }
 
         UnityEditor.EditorUtility.SetDirty(testEquipmentDataAsset);
         UnityEditor.AssetDatabase.SaveAssets();
-        Debug.Log($"Đã lưu {testEquipmentDataAsset.skinNames.Count} skin vào Asset: {testEquipmentDataAsset.name}");
+        Debug.Log($"Đã lưu {testEquipmentDataAsset.skinNames.Count} skin + " +
+                  $"{testEquipmentDataAsset.attachmentPairs.Count} override vào Asset: {testEquipmentDataAsset.name}");
     }
 
     [HorizontalGroup("SaveLoad")]
@@ -243,7 +478,26 @@ public class CharacterManager : MonoBehaviour
             mySkinSet[i].isEnabled = savedSkins.Contains(mySkinSet[i].skinName);
         }
 
-        Debug.Log($"Đã tải {testEquipmentDataAsset.skinNames.Count} skin từ Asset: {testEquipmentDataAsset.name}");
+        // Tải Override từng slot
+        var dataAsset = GetTargetSkeletonDataAsset();
+        myAttachmentSet = new List<SlotAttachmentPair>();
+        for (int i = 0; i < testEquipmentDataAsset.attachmentPairs.Count; i++)
+        {
+            var saved = testEquipmentDataAsset.attachmentPairs[i];
+            if (saved == null) continue;
+
+            myAttachmentSet.Add(new SlotAttachmentPair
+            {
+                isEnabled = saved.isEnabled,
+                skinName = saved.skinName,
+                slotName = saved.slotName,
+                attachmentName = saved.attachmentName,
+                skeletonDataAsset = dataAsset != null ? dataAsset : saved.skeletonDataAsset
+            });
+        }
+
+        Debug.Log($"Đã tải {testEquipmentDataAsset.skinNames.Count} skin + " +
+                  $"{myAttachmentSet.Count} override từ Asset: {testEquipmentDataAsset.name}");
         EditorEquip(); // Cập nhật luôn lên màn hình test
     }
 
@@ -254,20 +508,11 @@ public class CharacterManager : MonoBehaviour
     {
         if (targetTestCharacter == null) return;
 
-        List<string> enabledSkins = new List<string>();
-        if (mySkinSet != null)
-        {
-            for (int i = 0; i < mySkinSet.Count; i++)
-            {
-                if (mySkinSet[i].isEnabled && !string.IsNullOrEmpty(mySkinSet[i].skinName))
-                {
-                    enabledSkins.Add(mySkinSet[i].skinName);
-                }
-            }
-        }
+        List<string> enabledSkins = GetEnabledSkinNames();
+        List<SlotAttachmentPair> pairs = GetMeaningfulPairs();
 
-        targetTestCharacter.MixSkinsAndAttachments(enabledSkins, null);
-        Debug.Log($"Đã mặc {enabledSkins.Count} skin.");
+        targetTestCharacter.MixSkinsAndAttachments(enabledSkins, pairs);
+        Debug.Log($"Đã mặc {enabledSkins.Count} skin + {pairs.Count} override.");
     }
 
     [Button("Tắt Tất Cả Đồ (Chỉ Target)", ButtonSizes.Medium)]
@@ -281,8 +526,18 @@ public class CharacterManager : MonoBehaviour
             for (int i = 0; i < mySkinSet.Count; i++) mySkinSet[i].isEnabled = false;
         }
 
+        if (myAttachmentSet != null)
+        {
+            // CHỈ bỏ tick, GIỮ NGUYÊN Skin nguồn + Placeholder để còn thấy ảnh và bật lại được.
+            for (int i = 0; i < myAttachmentSet.Count; i++)
+            {
+                if (myAttachmentSet[i] == null) continue;
+                myAttachmentSet[i].isEnabled = false;
+            }
+        }
+
         // Đắp lại rỗng
-        targetTestCharacter.MixSkinsAndAttachments(new List<string>(), null);
+        targetTestCharacter.MixSkinsAndAttachments(new List<string>(), new List<SlotAttachmentPair>());
     }
 
 #endif
@@ -293,8 +548,39 @@ public class CharacterManager : MonoBehaviour
 /// Một entry trong danh sách skin, có checkbox bật/tắt.
 /// </summary>
 [System.Serializable]
-public class SkinToggleEntry
+public class SkinToggleEntry : ISearchFilterable
 {
+    /// <summary>
+    /// Gõ vào ô Search: tên skin bất kỳ, hoặc "on" / "off" để lọc theo trạng thái tick.
+    /// </summary>
+    public bool IsMatch(string searchString)
+    {
+        if (string.IsNullOrEmpty(searchString)) return true;
+
+        string[] terms = searchString.Split(' ');
+        for (int i = 0; i < terms.Length; i++)
+        {
+            string term = terms[i].Trim();
+            if (term.Length == 0) continue;
+
+            if (term.Equals("on", System.StringComparison.OrdinalIgnoreCase))
+            {
+                if (!isEnabled) return false;
+                continue;
+            }
+            if (term.Equals("off", System.StringComparison.OrdinalIgnoreCase))
+            {
+                if (isEnabled) return false;
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(skinName)) return false;
+            if (skinName.IndexOf(term, System.StringComparison.OrdinalIgnoreCase) < 0) return false;
+        }
+
+        return true;
+    }
+
     [TableColumnWidth(50, Resizable = false)]
     [LabelText("Bật")]
     public bool isEnabled;

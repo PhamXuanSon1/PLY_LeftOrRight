@@ -9,6 +9,9 @@ using Sirenix.OdinInspector;
 
 [System.Serializable]
 public class SlotAttachmentPair
+#if UNITY_EDITOR
+    : ISearchFilterable
+#endif
 {
 #if UNITY_EDITOR
     [TableColumnWidth(60, Resizable = false)]
@@ -17,13 +20,25 @@ public class SlotAttachmentPair
     public bool isEnabled = true;
 
 #if UNITY_EDITOR
+  [LabelText("Skin Nguồn")]
+  [ValueDropdown(nameof(GetSkinNames), DropdownWidth = 300)]
+  [SpineSkin(dataField: nameof(skeletonDataAsset))]
+  [Tooltip("Lấy Skin Placeholder từ Skin nào. BẮT BUỘC nếu placeholder trùng tên ở nhiều Skin.")]
+#endif
+  public string skinName;
+
+#if UNITY_EDITOR
+  [LabelText("Slot")]
   [ValueDropdown(nameof(GetSlotNames), IsUniqueList = true, DropdownWidth = 300)]
   [SpineSlot(dataField: nameof(skeletonDataAsset))]
 #endif
   public string slotName;
 
 #if UNITY_EDITOR
-  [SpineAttachment(false, slotField: nameof(slotName), dataField: nameof(skeletonDataAsset))]
+  [LabelText("Skin Placeholder")]
+  [ValueDropdown(nameof(GetPlaceholderNames), DropdownWidth = 300)]
+  [SpineAttachment(false, slotField: nameof(slotName), dataField: nameof(skeletonDataAsset),
+      skinField: nameof(skinName), placeholdersOnly: true)]
 #endif
   public string attachmentName;
 
@@ -33,6 +48,7 @@ public class SlotAttachmentPair
 #if UNITY_EDITOR
     // ===== PREVIEW ẢNH ATTACHMENT =====
     private static Dictionary<string, Texture2D> _previewCache = new Dictionary<string, Texture2D>();
+    private static HashSet<string> _previewMisses = new HashSet<string>();
 
     [ShowInInspector]
     [PreviewField(45, ObjectFieldAlignment.Center)]
@@ -45,13 +61,18 @@ public class SlotAttachmentPair
             if (skeletonDataAsset == null || string.IsNullOrEmpty(slotName) || string.IsNullOrEmpty(attachmentName))
                 return null;
 
-            string key = $"{skeletonDataAsset.GetInstanceID()}_{slotName}_{attachmentName}";
+            string key = $"{skeletonDataAsset.GetInstanceID()}_{skinName}_{slotName}_{attachmentName}";
             if (_previewCache.TryGetValue(key, out var cached) && cached != null)
                 return cached;
 
+            // Nhớ luôn các key không có ảnh, nếu không mỗi lần Inspector vẽ lại sẽ dựng preview lại từ đầu
+            // cho từng dòng -> bảng nhiều dòng sẽ rất giật.
+            if (_previewMisses.Contains(key)) return null;
+
             var preview = GeneratePreview();
-            if (preview != null)
-                _previewCache[key] = preview;
+            if (preview != null) _previewCache[key] = preview;
+            else _previewMisses.Add(key);
+
             return preview;
         }
     }
@@ -66,6 +87,7 @@ public class SlotAttachmentPair
             if (tex != null) Object.DestroyImmediate(tex);
         }
         _previewCache.Clear();
+        _previewMisses.Clear();
     }
 
     private Texture2D GeneratePreview()
@@ -78,22 +100,33 @@ public class SlotAttachmentPair
 
         int slotIndex = sd.Index;
 
+        // Ưu tiên đúng Skin nguồn đã chọn, vì cùng một placeholder có thể tồn tại ở nhiều Skin
+        var sourceSkin = string.IsNullOrEmpty(skinName) ? null : skeletonData.FindSkin(skinName);
+        if (sourceSkin != null)
+        {
+            var fromSource = ExtractAttachmentTexture(sourceSkin.GetAttachment(slotIndex, attachmentName));
+            if (fromSource != null) return fromSource;
+            // Skin nguồn không có placeholder này -> vẫn quét tiếp để có ảnh tham khảo
+        }
+
         for (int s = 0; s < skeletonData.Skins.Count; s++)
         {
-            var skin = skeletonData.Skins.Items[s];
-            var attachment = skin.GetAttachment(slotIndex, attachmentName);
-
-            AtlasRegion region = null;
-            if (attachment is RegionAttachment regionAtt)
-                region = regionAtt.Region as AtlasRegion;
-            else if (attachment is MeshAttachment meshAtt)
-                region = meshAtt.Region as AtlasRegion;
-
-            if (region != null)
-                return ExtractRegionTexture(region);
+            var texture = ExtractAttachmentTexture(skeletonData.Skins.Items[s].GetAttachment(slotIndex, attachmentName));
+            if (texture != null) return texture;
         }
 
         return null;
+    }
+
+    private static Texture2D ExtractAttachmentTexture(Attachment attachment)
+    {
+        AtlasRegion region = null;
+        if (attachment is RegionAttachment regionAtt)
+            region = regionAtt.Region as AtlasRegion;
+        else if (attachment is MeshAttachment meshAtt)
+            region = meshAtt.Region as AtlasRegion;
+
+        return region != null ? ExtractRegionTexture(region) : null;
     }
 
     private static Texture2D ExtractRegionTexture(AtlasRegion region)
@@ -157,19 +190,171 @@ public class SlotAttachmentPair
     }
 #endif
 
-  // Dropdown function
+#if UNITY_EDITOR
+  // ===== TÌM KIẾM TRONG BẢNG =====
+
+  /// <summary>
+  /// Gõ vào ô Search phía trên bảng:
+  ///   hair            -> tìm trong cả Skin nguồn, Slot và Placeholder
+  ///   skin:hair_Kpop  -> chỉ lọc theo tên Skin nguồn
+  ///   slot:head       -> chỉ lọc theo tên Slot
+  ///   ph:front_Hair   -> chỉ lọc theo tên Skin Placeholder
+  ///   on / off        -> lọc theo trạng thái tick
+  /// Nhiều từ khoá cách nhau bằng dấu cách thì phải khớp TẤT CẢ.
+  /// </summary>
+  public bool IsMatch(string searchString)
+  {
+    if (string.IsNullOrEmpty(searchString)) return true;
+
+    string[] terms = searchString.Split(' ');
+    for (int i = 0; i < terms.Length; i++)
+    {
+      string term = terms[i].Trim();
+      if (term.Length == 0) continue;
+      if (!IsMatchSingleTerm(term)) return false;
+    }
+
+    return true;
+  }
+
+  private bool IsMatchSingleTerm(string term)
+  {
+    if (TryTakePrefix(term, "skin:", out string skinTerm)) return Contains(skinName, skinTerm);
+    if (TryTakePrefix(term, "slot:", out string slotTerm)) return Contains(slotName, slotTerm);
+    if (TryTakePrefix(term, "ph:", out string phTerm)) return Contains(attachmentName, phTerm);
+
+    if (term.Equals("on", System.StringComparison.OrdinalIgnoreCase)) return isEnabled;
+    if (term.Equals("off", System.StringComparison.OrdinalIgnoreCase)) return !isEnabled;
+
+    return Contains(skinName, term) || Contains(slotName, term) || Contains(attachmentName, term);
+  }
+
+  private static bool TryTakePrefix(string term, string prefix, out string rest)
+  {
+    if (term.StartsWith(prefix, System.StringComparison.OrdinalIgnoreCase))
+    {
+      rest = term.Substring(prefix.Length);
+      return true;
+    }
+
+    rest = null;
+    return false;
+  }
+
+  private static bool Contains(string source, string term)
+  {
+    if (string.IsNullOrEmpty(term)) return true;
+    if (string.IsNullOrEmpty(source)) return false;
+    return source.IndexOf(term, System.StringComparison.OrdinalIgnoreCase) >= 0;
+  }
+#endif
+
+  // ===== DROPDOWN =====
+
+  private SkeletonData GetSkeletonData()
+  {
+    return skeletonDataAsset != null ? skeletonDataAsset.GetSkeletonData(true) : null;
+  }
+
+#if UNITY_EDITOR
+  /// <summary>
+  /// Chỉ liệt kê Skin thật sự có hình (bỏ 'default' và các Skin rỗng như 'empty').
+  /// </summary>
+  private IEnumerable<ValueDropdownItem<string>> GetSkinNames()
+  {
+    var items = new List<ValueDropdownItem<string>>
+    {
+      new ValueDropdownItem<string>("(Chưa chọn)", string.Empty)
+    };
+
+    SkeletonData skeletonData = GetSkeletonData();
+    if (skeletonData == null) return items;
+
+    for (int i = 0; i < skeletonData.Skins.Count; i++)
+    {
+      Skin skin = skeletonData.Skins.Items[i];
+      if (skin.Name == "default") continue;
+
+      int count = 0;
+      foreach (Skin.SkinEntry unused in skin.Attachments) count++;
+      if (count == 0) continue; // Skin rỗng, tách ra cũng không có gì
+
+      items.Add(new ValueDropdownItem<string>($"{skin.Name}  ({count} phần)", skin.Name));
+    }
+
+    return items;
+  }
+#endif
+
+  /// <summary>
+  /// Nếu đã chọn Skin nguồn thì chỉ liệt kê các slot mà Skin đó có, cho gọn.
+  /// </summary>
   private IEnumerable<string> GetSlotNames()
   {
-    if (skeletonDataAsset == null)
-      return new[] { "(No SkeletonDataAsset assigned)" };
-
-    SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
+    SkeletonData skeletonData = GetSkeletonData();
     if (skeletonData == null)
-      return new[] { "(SkeletonData not loaded)" };
+      return new[] { "(Chưa gán SkeletonDataAsset)" };
 
     var names = new List<string>();
+
+    Skin sourceSkin = string.IsNullOrEmpty(skinName) ? null : skeletonData.FindSkin(skinName);
+    if (sourceSkin != null)
+    {
+      var slotIndexes = new HashSet<int>();
+      foreach (Skin.SkinEntry entry in sourceSkin.Attachments)
+        slotIndexes.Add(entry.SlotIndex);
+
+      foreach (SlotData slot in skeletonData.Slots)
+        if (slotIndexes.Contains(slot.Index)) names.Add(slot.Name);
+
+      if (names.Count > 0) return names;
+    }
+
     foreach (SlotData slot in skeletonData.Slots)
       names.Add(slot.Name);
+
+    return names;
+  }
+
+  /// <summary>
+  /// Liệt kê tên Skin Placeholder của slot đang chọn, trong Skin nguồn đang chọn.
+  /// </summary>
+  private IEnumerable<string> GetPlaceholderNames()
+  {
+    SkeletonData skeletonData = GetSkeletonData();
+    if (skeletonData == null)
+      return new[] { "(Chưa gán SkeletonDataAsset)" };
+    if (string.IsNullOrEmpty(slotName))
+      return new[] { "(Hãy chọn Slot trước)" };
+
+    SlotData slotData = skeletonData.FindSlot(slotName);
+    if (slotData == null)
+      return new[] { "(Không tìm thấy slot)" };
+
+    var names = new List<string> { string.Empty };
+    var entries = new List<Skin.SkinEntry>();
+
+    Skin sourceSkin = string.IsNullOrEmpty(skinName) ? null : skeletonData.FindSkin(skinName);
+    if (sourceSkin != null)
+    {
+      sourceSkin.GetAttachments(slotData.Index, entries);
+      for (int i = 0; i < entries.Count; i++)
+        if (!names.Contains(entries[i].Name)) names.Add(entries[i].Name);
+
+      if (names.Count == 1)
+        return new[] { $"(Skin '{skinName}' không có phần nào ở slot này)" };
+
+      return names;
+    }
+
+    // Chưa chọn Skin nguồn -> gom placeholder từ mọi Skin (có thể trùng tên giữa các Skin)
+    for (int s = 0; s < skeletonData.Skins.Count; s++)
+    {
+      entries.Clear();
+      skeletonData.Skins.Items[s].GetAttachments(slotData.Index, entries);
+      for (int i = 0; i < entries.Count; i++)
+        if (!names.Contains(entries[i].Name)) names.Add(entries[i].Name);
+    }
 
     return names;
   }
