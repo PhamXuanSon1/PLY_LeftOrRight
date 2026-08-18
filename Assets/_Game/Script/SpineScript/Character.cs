@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Spine;
 using Spine.Unity;
+using Spine.Unity.AttachmentTools;
 using UnityEngine;
 
 
@@ -28,6 +29,9 @@ public class Character : Ply_GameUnit
 
     // Nhớ luôn Skin nguồn của từng slot bị ép, vì cùng một Skin Placeholder có thể tồn tại ở nhiều Skin
     private Dictionary<string, string> forcedSourceSkins = new Dictionary<string, string>();
+
+
+    private static readonly int StraightAlphaProperty = Shader.PropertyToID("_StraightAlphaInput");
 
     private void OnEnable()
     {
@@ -172,7 +176,7 @@ public class Character : Ply_GameUnit
                 if (source == null || string.IsNullOrEmpty(source.slotName)) continue;
 
                 UpsertPair(currentAppliedPairs, source.skinName, source.slotName, source.attachmentName,
-                    source.isEnabled, source.skeletonDataAsset);
+                    source.isEnabled, source.skeletonDataAsset, source.customPreview);
             }
         }
 
@@ -204,14 +208,15 @@ public class Character : Ply_GameUnit
     /// </summary>
     /// <param name="sourceSkinName">Skin chứa placeholder này. Nên điền, vì cùng một placeholder
     /// (ví dụ "face", "hair1/front_Hair") có mặt ở nhiều Skin khác nhau.</param>
+    /// <param name="customTexture">Ảnh PNG rời dùng thay cho hình gốc. Để null nếu dùng hình trong atlas.</param>
     public void AddAttachmentOverride(string sourceSkinName, string slotName, string placeholderName,
-        bool enabled = true)
+        bool enabled = true, Texture2D customTexture = null)
     {
         if (string.IsNullOrEmpty(slotName)) return;
 
         if (currentAppliedPairs == null) currentAppliedPairs = new List<SlotAttachmentPair>();
         UpsertPair(currentAppliedPairs, sourceSkinName, slotName, placeholderName, enabled,
-            skeletonAnimation != null ? skeletonAnimation.SkeletonDataAsset : null);
+            skeletonAnimation != null ? skeletonAnimation.SkeletonDataAsset : null, customTexture);
 
 #if UNITY_EDITOR
         if (!Application.isPlaying) UnityEditor.EditorUtility.SetDirty(this);
@@ -244,7 +249,7 @@ public class Character : Ply_GameUnit
     }
 
     private static void UpsertPair(List<SlotAttachmentPair> list, string skinName, string slotName,
-        string placeholderName, bool enabled, SkeletonDataAsset dataAsset)
+        string placeholderName, bool enabled, SkeletonDataAsset dataAsset, Texture2D customTexture)
     {
         for (int i = 0; i < list.Count; i++)
         {
@@ -253,6 +258,7 @@ public class Character : Ply_GameUnit
             list[i].isEnabled = enabled;
             list[i].skinName = skinName;
             list[i].attachmentName = placeholderName;
+            list[i].customPreview = customTexture;
             if (dataAsset != null) list[i].skeletonDataAsset = dataAsset;
             return;
         }
@@ -263,6 +269,7 @@ public class Character : Ply_GameUnit
             skinName = skinName,
             slotName = slotName,
             attachmentName = placeholderName,
+            customPreview = customTexture,
             skeletonDataAsset = dataAsset
         });
     }
@@ -309,6 +316,11 @@ public class Character : Ply_GameUnit
             {
                 var pair = pairs[i];
                 if (pair == null || string.IsNullOrEmpty(pair.slotName)) continue;
+
+                // Bỏ tick = không dùng dòng này. Slot giữ nguyên theo Skin nền.
+                // Dòng chỉ có ảnh rời (chưa chọn placeholder) vẫn hợp lệ: lấy tên file ảnh làm placeholder.
+                if (!pair.isEnabled || string.IsNullOrEmpty(pair.ResolvedPlaceholderName)) continue;
+
                 if (!overriddenSlots.Add(pair.slotName)) continue;
                 overrides.Add(pair);
             }
@@ -337,12 +349,13 @@ public class Character : Ply_GameUnit
         for (int i = 0; i < overrides.Count; i++)
         {
             var pair = overrides[i];
-            if (!pair.isEnabled || string.IsNullOrEmpty(pair.attachmentName)) continue;
+            if (!pair.isEnabled || string.IsNullOrEmpty(pair.ResolvedPlaceholderName)) continue;
 
             SlotData slotData = skeletonData.FindSlot(pair.slotName);
             if (slotData == null) continue;
 
-            MergeAttachmentIntoCustomSkin(skeletonData, pair.skinName, slotData.Index, pair.attachmentName);
+            MergeAttachmentIntoCustomSkin(skeletonData, pair.skinName, slotData.Index, pair.attachmentName,
+                pair.customPreview);
         }
 
         // 5. Đắp tổng hợp Skin lên nhân vật
@@ -353,8 +366,9 @@ public class Character : Ply_GameUnit
         for (int i = 0; i < overrides.Count; i++)
         {
             var pair = overrides[i];
-            bool turnOn = pair.isEnabled && !string.IsNullOrEmpty(pair.attachmentName);
-            ForceSlotAttachment(skeleton, pair.slotName, turnOn ? pair.attachmentName : null, pair.skinName);
+            string placeholderName = pair.ResolvedPlaceholderName;
+            bool turnOn = pair.isEnabled && !string.IsNullOrEmpty(placeholderName);
+            ForceSlotAttachment(skeleton, pair.slotName, turnOn ? placeholderName : null, pair.skinName);
         }
 
         if (Application.isPlaying)
@@ -367,15 +381,22 @@ public class Character : Ply_GameUnit
         }
     }
 
+    private static bool IsStraightAlpha(Material material)
+    {
+        return material.HasProperty(StraightAlphaProperty) && material.GetFloat(StraightAlphaProperty) > 0.5f;
+    }
+
     /// <summary>
     /// Copy đúng MỘT Skin Placeholder (slot + placeholder) từ Skin nguồn vào customSkin.
     /// Bắt buộc phải có sourceSkinName khi placeholder trùng tên ở nhiều Skin — nếu để trống,
     /// hàm sẽ quét lần lượt và lấy Skin đầu tiên khớp (dễ ra nhầm hình).
     /// </summary>
     private bool MergeAttachmentIntoCustomSkin(SkeletonData skeletonData, string sourceSkinName, int slotIndex,
-        string placeholderName)
+        string placeholderName, Texture2D customTexture = null)
     {
         if (string.IsNullOrEmpty(placeholderName)) return false;
+
+        string slotDisplayName = skeletonData.Slots.Items[slotIndex].Name;
 
         // Có chỉ định Skin nguồn -> lấy chính xác từ đó
         if (!string.IsNullOrEmpty(sourceSkinName))
@@ -390,12 +411,17 @@ public class Character : Ply_GameUnit
             Attachment sourceAttachment = sourceSkin.GetAttachment(slotIndex, placeholderName);
             if (sourceAttachment == null)
             {
+                // Không có hình gốc, nhưng nếu có ảnh rời thì vẫn dựng được attachment mới
+                if (customTexture != null)
+                    return CreateAttachmentFromTexture(customTexture, slotIndex, placeholderName);
+
                 Debug.LogWarning($"[{name}] Skin '{sourceSkinName}' không có placeholder '{placeholderName}' " +
-                                 $"ở slot '{skeletonData.Slots.Items[slotIndex].Name}'.");
+                                 $"ở slot '{slotDisplayName}'.");
                 return false;
             }
 
-            customSkin.SetAttachment(slotIndex, placeholderName, sourceAttachment);
+            customSkin.SetAttachment(slotIndex, placeholderName,
+                ApplyCustomTexture(sourceAttachment, customTexture));
             return true;
         }
 
@@ -417,15 +443,141 @@ public class Character : Ply_GameUnit
             }
 
             Debug.LogWarning($"[{name}] Placeholder '{placeholderName}' ở slot " +
-                             $"'{skeletonData.Slots.Items[slotIndex].Name}' có mặt ở nhiều Skin " +
+                             $"'{slotDisplayName}' có mặt ở nhiều Skin " +
                              $"(ví dụ '{foundSkinName}' và '{skin.Name}'). Hãy điền Skin Nguồn để chọn đúng hình.");
             break;
         }
 
-        if (found == null) return false;
+        if (found == null)
+        {
+            // Slot rỗng (không Skin nào có hình cho nó). Đây là trường hợp gắn art hoàn toàn mới
+            // từ file PNG rời — dựng thẳng RegionAttachment thay vì báo lỗi.
+            if (customTexture != null)
+                return CreateAttachmentFromTexture(customTexture, slotIndex, placeholderName);
 
-        customSkin.SetAttachment(slotIndex, placeholderName, found);
+            return false;
+        }
+
+        customSkin.SetAttachment(slotIndex, placeholderName, ApplyCustomTexture(found, customTexture));
         return true;
+    }
+
+    /// <summary>
+    /// Tạo attachment mới hoàn toàn từ một file ảnh rời, dùng cho slot chưa có hình ở bất kỳ Skin nào.
+    /// </summary>
+    private bool CreateAttachmentFromTexture(Texture2D customTexture, int slotIndex, string placeholderName)
+    {
+        Material sourceMaterial = GetAtlasMaterial();
+        if (sourceMaterial == null)
+        {
+            Debug.LogWarning($"[{name}] Không lấy được Material của atlas nên chưa gắn được ảnh " +
+                             $"'{customTexture.name}'.");
+            return false;
+        }
+
+        AtlasRegion region = GetOrCreateCustomRegion(customTexture, sourceMaterial);
+        if (region == null) return false;
+
+        float scale = skeletonAnimation != null && skeletonAnimation.SkeletonDataAsset != null
+            ? skeletonAnimation.SkeletonDataAsset.scale
+            : 0.01f;
+
+        RegionAttachment attachment = region.ToRegionAttachment(placeholderName, scale);
+        if (attachment == null) return false;
+
+        customSkin.SetAttachment(slotIndex, placeholderName, attachment);
+        return true;
+    }
+
+    /// <summary>
+    /// Material của atlas Spine, dùng làm nguồn shader/thuộc tính cho ảnh rời.
+    /// </summary>
+    private Material GetAtlasMaterial()
+    {
+        var dataAsset = skeletonAnimation != null ? skeletonAnimation.SkeletonDataAsset : null;
+        if (dataAsset == null || dataAsset.atlasAssets == null) return null;
+
+        for (int i = 0; i < dataAsset.atlasAssets.Length; i++)
+        {
+            var atlasAsset = dataAsset.atlasAssets[i];
+            if (atlasAsset != null && atlasAsset.PrimaryMaterial != null) return atlasAsset.PrimaryMaterial;
+        }
+
+        return null;
+    }
+
+    // Cache region đã dựng từ ảnh thay thế: (texture, material) -> AtlasRegion.
+    // Nếu không cache thì mỗi lần đắp đồ lại tạo thêm 1 Texture2D + 1 Material -> rò rỉ bộ nhớ.
+    private static Dictionary<long, AtlasRegion> customRegionCache = new Dictionary<long, AtlasRegion>();
+
+    /// <summary>
+    /// Nếu dòng có gán Ảnh Thay Thế thì dựng bản sao của attachment dùng ảnh đó.
+    /// MeshAttachment được clone dạng linked mesh nên vẫn ăn theo animation biến dạng của bản gốc.
+    /// </summary>
+    private Attachment ApplyCustomTexture(Attachment original, Texture2D customTexture)
+    {
+        if (original == null || customTexture == null) return original;
+
+        Material sourceMaterial = GetAttachmentMaterial(original);
+        if (sourceMaterial == null)
+        {
+            Debug.LogWarning($"[{name}] Không lấy được Material gốc của attachment '{original.Name}', " +
+                             "bỏ qua ảnh thay thế.");
+            return original;
+        }
+
+        AtlasRegion region = GetOrCreateCustomRegion(customTexture, sourceMaterial);
+        if (region == null) return original;
+
+        // useOriginalRegionSize = true: giữ đúng kích thước của attachment gốc, không phình theo pixel của ảnh mới
+        return original.GetRemappedClone(region, cloneMeshAsLinked: true, useOriginalRegionSize: true);
+    }
+
+    /// <summary>
+    /// Dựng (và cache) AtlasRegion từ một ảnh rời, chọn đúng cách xử lý alpha theo material của atlas.
+    /// </summary>
+    private AtlasRegion GetOrCreateCustomRegion(Texture2D customTexture, Material sourceMaterial)
+    {
+        long cacheKey = ((long)customTexture.GetInstanceID() << 32) ^ (uint)sourceMaterial.GetInstanceID();
+
+        AtlasRegion region;
+        if (customRegionCache.TryGetValue(cacheKey, out region) && region != null) return region;
+
+        if (IsStraightAlpha(sourceMaterial))
+        {
+            // Material của atlas đang bật Straight Alpha Input -> shader tự xử lý alpha,
+            // KHÔNG được nhân alpha trước, nếu không ảnh sẽ bị tối đi.
+            // Đường này cũng không cần ảnh bật Read/Write.
+            region = customTexture.ToAtlasRegion(sourceMaterial);
+        }
+        else if (customTexture.isReadable)
+        {
+            // Atlas dùng premultiplied alpha -> phải nhân alpha vào màu cho khớp
+            region = customTexture.ToAtlasRegionPMAClone(sourceMaterial);
+        }
+        else
+        {
+            Debug.LogWarning($"[{name}] Atlas dùng premultiplied alpha nhưng ảnh '{customTexture.name}' " +
+                             "chưa bật Read/Write Enabled nên không chuyển sang PMA được. " +
+                             "Ảnh vẫn hiện nhưng viền có thể bị sáng/tối bất thường. " +
+                             "Vào Import Settings của ảnh và tick Read/Write Enabled.");
+            region = customTexture.ToAtlasRegion(sourceMaterial);
+        }
+
+        customRegionCache[cacheKey] = region;
+        return region;
+    }
+
+    private static Material GetAttachmentMaterial(Attachment attachment)
+    {
+        AtlasRegion region = null;
+        if (attachment is RegionAttachment regionAttachment)
+            region = regionAttachment.Region as AtlasRegion;
+        else if (attachment is MeshAttachment meshAttachment)
+            region = meshAttachment.Region as AtlasRegion;
+
+        if (region == null || region.page == null) return null;
+        return region.page.rendererObject as Material;
     }
 
     /// <summary>

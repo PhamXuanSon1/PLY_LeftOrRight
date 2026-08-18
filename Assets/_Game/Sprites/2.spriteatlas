@@ -42,6 +42,7 @@ SpriteAtlas:
     - be2a2b013d1435841a8d579e51108e3f: 21300000
     - 69dd7f4125d52ad4a8817f109f055042: 21300000
     - 2f0e1951585ce73478912beb2919e9fd: 21300000
+    - 8689c1e117a0b1d40a777444f64fd487: 21300000
     - 6d7810128511bc74982dfe4c7aadb95b: 21300000
     - 27c060b22f1832045b03e0726b668bed: 21300000
     - 485da7d25e398a8458c9bc99af5aaae7: 21300000
@@ -54,6 +55,7 @@ SpriteAtlas:
     - ccdbf2d4ec2f06b48ab4ae580bc2bfed: 21300000
     - fcc59ff4ac98eb649add82e9613a0229: 21300000
     - c39e110512afcce4997ca5c8d2360ab9: 21300000
+    - 71169525cadf9da4b94984d315997571: 21300000
     - 8591de55ba0dca6449c5e2499ccad253: 21300000
     - 9871f885648cdc44a87f6df103518116: 1609524865
     - 36c6f3b595683be40b12c7899ef7b0c1: 21300000
@@ -104,6 +106,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: be2a2b013d1435841a8d579e51108e3f, type: 3}
   - {fileID: 21300000, guid: 69dd7f4125d52ad4a8817f109f055042, type: 3}
   - {fileID: 21300000, guid: 2f0e1951585ce73478912beb2919e9fd, type: 3}
+  - {fileID: 21300000, guid: 8689c1e117a0b1d40a777444f64fd487, type: 3}
   - {fileID: 21300000, guid: 6d7810128511bc74982dfe4c7aadb95b, type: 3}
   - {fileID: 21300000, guid: 27c060b22f1832045b03e0726b668bed, type: 3}
   - {fileID: 21300000, guid: 485da7d25e398a8458c9bc99af5aaae7, type: 3}
@@ -116,6 +119,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: ccdbf2d4ec2f06b48ab4ae580bc2bfed, type: 3}
   - {fileID: 21300000, guid: fcc59ff4ac98eb649add82e9613a0229, type: 3}
   - {fileID: 21300000, guid: c39e110512afcce4997ca5c8d2360ab9, type: 3}
+  - {fileID: 21300000, guid: 71169525cadf9da4b94984d315997571, type: 3}
   - {fileID: 21300000, guid: 8591de55ba0dca6449c5e2499ccad253, type: 3}
   - {fileID: 1609524865, guid: 9871f885648cdc44a87f6df103518116, type: 3}
   - {fileID: 21300000, guid: 36c6f3b595683be40b12c7899ef7b0c1, type: 3}
@@ -165,6 +169,7 @@ SpriteAtlas:
   - eyes_icon
   - CircleFillWhite (1) (1)
   - graet
+  - back Hair
   - shoe_zootopia_1
   - emoji-fail-2
   - acc_zootopia_2
@@ -177,6 +182,7 @@ SpriteAtlas:
   - hair_zootopia_1
   - ball_lor_0
   - ghe_2
+  - front_Hair
   - emoji-fail-1
   - arrow-slide_0
   - face_zootopia_2

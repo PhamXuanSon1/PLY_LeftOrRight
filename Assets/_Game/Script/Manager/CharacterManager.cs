@@ -47,15 +47,15 @@ public class CharacterManager : MonoBehaviour
     [Title("Danh Sách Skin Đang Chọn (Base)")]
     [InfoBox("Tick vào các Skin nền tảng bạn muốn mặc cho nhân vật. Có thể chọn nhiều Skin cùng lúc (mix).")]
     [ListDrawerSettings(ShowFoldout = true)]
-    [Searchable(FilterOptions = SearchFilterOptions.ISearchFilterableInterface)]
+    [Searchable(FilterOptions = SearchFilterOptions.ValueToString | SearchFilterOptions.ISearchFilterableInterface)]
     public List<SkinToggleEntry> mySkinSet = new List<SkinToggleEntry>();
 
     // ===== DANH SÁCH OVERRIDE TỪNG SLOT =====
     [Title("Override Từng Slot (Đè Lên Skin)")]
     [InfoBox("Mỗi dòng = lấy 1 Skin Placeholder từ 1 Skin nguồn rồi đắp lên 1 slot.\n" +
-             "Tick = ép mặc placeholder đó lên slot (kể cả Skin nền không có).\n" +
-             "Bỏ tick + CÓ placeholder = ép TẮT slot đó (khoét bớt Skin nền).\n" +
-             "Bỏ tick + TRỐNG placeholder = bỏ qua dòng, slot giữ nguyên theo Skin nền.\n" +
+             "Tick = dùng dòng này. Bỏ tick = không dùng, và KHÔNG được lưu vào Asset.\n" +
+             "Cột 'Ảnh Thay Thế': kéo ảnh vào để nhân vật dùng ảnh đó thay cho hình trong atlas Spine " +
+             "(ảnh cần bật Read/Write Enabled trong Import Settings).\n" +
              "LƯU Ý: file Spine này có nhiều placeholder trùng tên ở nhiều Skin (face, head, hair1/front_Hair...) " +
              "nên BẮT BUỘC phải điền Skin Nguồn.\n\n" +
              "TÌM KIẾM (ô Search ngay trên bảng):\n" +
@@ -66,7 +66,7 @@ public class CharacterManager : MonoBehaviour
              "   on / off             → lọc theo trạng thái tick\n" +
              "   skin:shirt on        → nhiều từ khoá = phải khớp TẤT CẢ")]
     [TableList(ShowIndexLabels = true)]
-    [Searchable(FilterOptions = SearchFilterOptions.ISearchFilterableInterface)]
+    [Searchable(FilterOptions = SearchFilterOptions.ValueToString | SearchFilterOptions.ISearchFilterableInterface)]
     public List<SlotAttachmentPair> myAttachmentSet = new List<SlotAttachmentPair>();
 
 
@@ -254,24 +254,30 @@ public class CharacterManager : MonoBehaviour
         if (myAttachmentSet == null) myAttachmentSet = new List<SlotAttachmentPair>();
 
         int added = 0;
+        var skipped = new List<string>();
+
         foreach (Skin.SkinEntry entry in skin.Attachments)
         {
             string slotName = skeletonData.Slots.Items[entry.SlotIndex].Name;
 
-            // Đã có dòng cho slot này rồi thì cập nhật, chưa có thì thêm mới
-            bool exists = false;
+            // KHÔNG đụng vào dòng đã có: giữ nguyên trạng thái tick, Skin nguồn và ảnh tự chọn
+            // mà bạn đã chỉnh tay. Mỗi slot chỉ được phép có 1 dòng override.
+            SlotAttachmentPair existing = null;
             for (int i = 0; i < myAttachmentSet.Count; i++)
             {
-                if (myAttachmentSet[i] == null || myAttachmentSet[i].slotName != slotName) continue;
-
-                myAttachmentSet[i].isEnabled = true;
-                myAttachmentSet[i].skinName = skinToSplit;
-                myAttachmentSet[i].attachmentName = entry.Name;
-                myAttachmentSet[i].skeletonDataAsset = skeletonDataAsset;
-                exists = true;
-                break;
+                if (myAttachmentSet[i] != null && myAttachmentSet[i].slotName == slotName)
+                {
+                    existing = myAttachmentSet[i];
+                    break;
+                }
             }
-            if (exists) continue;
+
+            if (existing != null)
+            {
+                string owner = string.IsNullOrEmpty(existing.skinName) ? "(chưa có Skin nguồn)" : existing.skinName;
+                skipped.Add($"{slotName} ← đang thuộc '{owner}'{(existing.isEnabled ? "" : ", đang tắt")}");
+                continue;
+            }
 
             myAttachmentSet.Add(new SlotAttachmentPair
             {
@@ -284,7 +290,14 @@ public class CharacterManager : MonoBehaviour
             added++;
         }
 
-        Debug.Log($"Đã tách Skin '{skinToSplit}' thành {added} dòng mới (tổng {myAttachmentSet.Count}).");
+        Debug.Log($"Đã tách Skin '{skinToSplit}': thêm {added} dòng mới (tổng {myAttachmentSet.Count}).");
+
+        if (skipped.Count > 0)
+        {
+            Debug.LogWarning($"Bỏ qua {skipped.Count} slot vì đã có dòng sẵn (giữ nguyên, không ghi đè):\n" +
+                             "   " + string.Join("\n   ", skipped) +
+                             "\nMuốn dùng phần của Skin mới thì xoá dòng cũ rồi Tách lại.");
+        }
     }
 
     /// <summary>
@@ -317,6 +330,43 @@ public class CharacterManager : MonoBehaviour
         }
 
         return items;
+    }
+
+    [Button("Tự Điền Placeholder Còn Thiếu", ButtonSizes.Medium)]
+    [GUIColor(0.5f, 1f, 0.7f)]
+    public void AutoFillMissingPlaceholders()
+    {
+        if (myAttachmentSet == null) return;
+
+        var skeletonDataAsset = GetTargetSkeletonDataAsset();
+        int filled = 0;
+        var stillMissing = new List<string>();
+
+        for (int i = 0; i < myAttachmentSet.Count; i++)
+        {
+            var pair = myAttachmentSet[i];
+            if (pair == null || string.IsNullOrEmpty(pair.slotName)) continue;
+
+            if (pair.skeletonDataAsset == null) pair.skeletonDataAsset = skeletonDataAsset;
+            if (pair.AutoFillPlaceholder()) filled++;
+
+            if (!string.IsNullOrEmpty(pair.attachmentName)) continue;
+
+            // Dòng đã có Ảnh Thay Thế thì không cần placeholder: tên file ảnh sẽ được dùng làm tên placeholder.
+            if (pair.customPreview != null) continue;
+
+            stillMissing.Add($"dòng {i} (slot '{pair.slotName}')");
+        }
+
+        Debug.Log($"Đã tự điền Placeholder cho {filled} dòng.");
+
+        if (stillMissing.Count > 0)
+        {
+            Debug.LogWarning($"Còn {stillMissing.Count} dòng chưa có Placeholder. Nguyên nhân: slot đó có " +
+                             "nhiều placeholder khác nhau (hãy chọn Skin Nguồn rồi chọn tay), HOẶC slot đó " +
+                             "rỗng - không Skin nào có hình cho nó (hãy gán Ảnh Thay Thế):\n" +
+                             "   " + string.Join("\n   ", stillMissing));
+        }
     }
 
     [Button("Làm Mới Ảnh Preview", ButtonSizes.Medium)]
@@ -399,25 +449,6 @@ public class CharacterManager : MonoBehaviour
         return enabledSkins;
     }
 
-    /// <summary>
-    /// Chỉ lấy các dòng thật sự có tác dụng: đã chọn slot VÀ (bật kèm attachment HOẶC tắt slot chủ động).
-    /// Dòng trống (chưa tick, chưa chọn attachment) được bỏ qua để không tắt oan slot của Skin nền.
-    /// </summary>
-    private List<SlotAttachmentPair> GetMeaningfulPairs()
-    {
-        var result = new List<SlotAttachmentPair>();
-        if (myAttachmentSet == null) return result;
-
-        for (int i = 0; i < myAttachmentSet.Count; i++)
-        {
-            var pair = myAttachmentSet[i];
-            if (pair == null || string.IsNullOrEmpty(pair.slotName)) continue;
-            if (!pair.isEnabled && string.IsNullOrEmpty(pair.attachmentName)) continue;
-
-            result.Add(pair);
-        }
-        return result;
-    }
 
     // ===== LƯU / TẢI =====
     [HorizontalGroup("SaveLoad")]
@@ -439,24 +470,54 @@ public class CharacterManager : MonoBehaviour
         var dataAsset = GetTargetSkeletonDataAsset();
         if (dataAsset != null) testEquipmentDataAsset.targetSkeletonDataAsset = dataAsset;
 
+        // CHỈ lưu các dòng đang tick. Dòng bỏ tick coi như không dùng, không đưa vào file data.
         testEquipmentDataAsset.attachmentPairs.Clear();
-        var meaningfulPairs = GetMeaningfulPairs();
-        for (int i = 0; i < meaningfulPairs.Count; i++)
+        var notSaved = new List<string>();
+
+        if (myAttachmentSet != null)
         {
-            testEquipmentDataAsset.attachmentPairs.Add(new SlotAttachmentPair
+            for (int i = 0; i < myAttachmentSet.Count; i++)
             {
-                isEnabled = meaningfulPairs[i].isEnabled,
-                skinName = meaningfulPairs[i].skinName,
-                slotName = meaningfulPairs[i].slotName,
-                attachmentName = meaningfulPairs[i].attachmentName,
-                skeletonDataAsset = dataAsset
-            });
+                var pair = myAttachmentSet[i];
+                if (pair == null || !pair.isEnabled) continue;
+
+                if (string.IsNullOrEmpty(pair.slotName))
+                {
+                    notSaved.Add($"dòng {i}: chưa chọn Slot");
+                    continue;
+                }
+
+                // Dòng chỉ có Ảnh Thay Thế vẫn hợp lệ: tên file ảnh được dùng làm tên placeholder.
+                if (string.IsNullOrEmpty(pair.ResolvedPlaceholderName))
+                {
+                    notSaved.Add($"dòng {i} (slot '{pair.slotName}'): chưa chọn Skin Placeholder, " +
+                                 "cũng chưa gán Ảnh Thay Thế");
+                    continue;
+                }
+
+                testEquipmentDataAsset.attachmentPairs.Add(new SlotAttachmentPair
+                {
+                    isEnabled = pair.isEnabled,
+                    skinName = pair.skinName,
+                    slotName = pair.slotName,
+                    attachmentName = pair.attachmentName,
+                    customPreview = pair.customPreview,
+                    skeletonDataAsset = dataAsset
+                });
+            }
         }
 
         UnityEditor.EditorUtility.SetDirty(testEquipmentDataAsset);
         UnityEditor.AssetDatabase.SaveAssets();
         Debug.Log($"Đã lưu {testEquipmentDataAsset.skinNames.Count} skin + " +
                   $"{testEquipmentDataAsset.attachmentPairs.Count} override vào Asset: {testEquipmentDataAsset.name}");
+
+        if (notSaved.Count > 0)
+        {
+            Debug.LogWarning($"CÓ {notSaved.Count} dòng đang tick nhưng KHÔNG lưu được vì thiếu thông tin:\n" +
+                             "   " + string.Join("\n   ", notSaved) +
+                             "\nBấm nút 'Tự Điền Placeholder Còn Thiếu' rồi Lưu lại.");
+        }
     }
 
     [HorizontalGroup("SaveLoad")]
@@ -492,6 +553,7 @@ public class CharacterManager : MonoBehaviour
                 skinName = saved.skinName,
                 slotName = saved.slotName,
                 attachmentName = saved.attachmentName,
+                customPreview = saved.customPreview,
                 skeletonDataAsset = dataAsset != null ? dataAsset : saved.skeletonDataAsset
             });
         }
@@ -509,10 +571,29 @@ public class CharacterManager : MonoBehaviour
         if (targetTestCharacter == null) return;
 
         List<string> enabledSkins = GetEnabledSkinNames();
-        List<SlotAttachmentPair> pairs = GetMeaningfulPairs();
 
-        targetTestCharacter.MixSkinsAndAttachments(enabledSkins, pairs);
-        Debug.Log($"Đã mặc {enabledSkins.Count} skin + {pairs.Count} override.");
+        // Truyền nguyên bảng: Character tự bỏ qua các dòng chưa cấu hình.
+        targetTestCharacter.MixSkinsAndAttachments(enabledSkins, myAttachmentSet);
+
+        int on = 0, custom = 0;
+        if (myAttachmentSet != null)
+        {
+            for (int i = 0; i < myAttachmentSet.Count; i++)
+            {
+                var pair = myAttachmentSet[i];
+                if (pair == null || !pair.isEnabled) continue;
+
+                // Dùng ResolvedPlaceholderName để dòng chỉ có Ảnh Thay Thế cũng được tính,
+                // đúng như tiêu chí mà SaveToAsset và Character đang dùng.
+                if (string.IsNullOrEmpty(pair.slotName) || string.IsNullOrEmpty(pair.ResolvedPlaceholderName))
+                    continue;
+
+                on++;
+                if (pair.customPreview != null) custom++;
+            }
+        }
+
+        Debug.Log($"Đã mặc {enabledSkins.Count} skin + {on} override (trong đó {custom} dòng dùng ảnh thay thế).");
     }
 
     [Button("Tắt Tất Cả Đồ (Chỉ Target)", ButtonSizes.Medium)]

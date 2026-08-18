@@ -22,6 +22,7 @@ public class SlotAttachmentPair
 #if UNITY_EDITOR
   [LabelText("Skin Nguồn")]
   [ValueDropdown(nameof(GetSkinNames), DropdownWidth = 300)]
+  [OnValueChanged(nameof(AutoFillPlaceholder))]
   [SpineSkin(dataField: nameof(skeletonDataAsset))]
   [Tooltip("Lấy Skin Placeholder từ Skin nào. BẮT BUỘC nếu placeholder trùng tên ở nhiều Skin.")]
 #endif
@@ -30,6 +31,7 @@ public class SlotAttachmentPair
 #if UNITY_EDITOR
   [LabelText("Slot")]
   [ValueDropdown(nameof(GetSlotNames), IsUniqueList = true, DropdownWidth = 300)]
+  [OnValueChanged(nameof(AutoFillPlaceholder))]
   [SpineSlot(dataField: nameof(skeletonDataAsset))]
 #endif
   public string slotName;
@@ -45,8 +47,32 @@ public class SlotAttachmentPair
   // This is required so Odin can resolve the slot list contextually
   public SkeletonDataAsset skeletonDataAsset;
 
+    // ===== ẢNH THAY THẾ =====
+    // Field này KHÔNG nằm trong #if UNITY_EDITOR vì nó phải tồn tại lúc chạy game.
+
 #if UNITY_EDITOR
-    // ===== PREVIEW ẢNH ATTACHMENT =====
+    [LabelText("Ảnh Thay Thế")]
+    [PreviewField(45, ObjectFieldAlignment.Center)]
+    [TableColumnWidth(60, Resizable = false)]
+#endif
+    [Tooltip("Kéo ảnh vào đây để nhân vật dùng ảnh này THAY CHO hình trong atlas Spine. " +
+             "Ảnh phải bật Read/Write Enabled trong Import Settings. Để trống = dùng hình gốc.")]
+    public Texture2D customPreview;
+
+    /// <summary>
+    /// Tên placeholder thật sự dùng để đăng ký vào Skin. Nếu chưa chọn placeholder mà đã có
+    /// ảnh thay thế thì lấy luôn tên file ảnh làm tên placeholder.
+    /// </summary>
+    public string ResolvedPlaceholderName
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(attachmentName)) return attachmentName;
+            return customPreview != null ? customPreview.name : null;
+        }
+    }
+
+#if UNITY_EDITOR
     private static Dictionary<string, Texture2D> _previewCache = new Dictionary<string, Texture2D>();
     private static HashSet<string> _previewMisses = new HashSet<string>();
 
@@ -58,6 +84,9 @@ public class SlotAttachmentPair
     {
         get
         {
+            // Tầng 1: ảnh do người dùng kéo vào
+            if (customPreview != null) return customPreview;
+
             if (skeletonDataAsset == null || string.IsNullOrEmpty(slotName) || string.IsNullOrEmpty(attachmentName))
                 return null;
 
@@ -76,6 +105,7 @@ public class SlotAttachmentPair
             return preview;
         }
     }
+
 
     /// <summary>
     /// Xoá toàn bộ cache preview (gọi khi cần refresh ảnh)
@@ -360,29 +390,58 @@ public class SlotAttachmentPair
   }
 
 #if UNITY_EDITOR
-  private void OnSlotNameChanged()
+  /// <summary>
+  /// Tự điền Skin Placeholder cho dòng này khi có thể suy ra chắc chắn.
+  /// Trả về true nếu vừa điền được giá trị mới.
+  /// Gọi tự động mỗi khi đổi Skin nguồn hoặc Slot, và gọi hàng loạt được từ CharacterManager.
+  /// </summary>
+  public bool AutoFillPlaceholder()
   {
-    if (string.IsNullOrEmpty(slotName) || skeletonDataAsset == null)
-      return;
+    if (skeletonDataAsset == null || string.IsNullOrEmpty(slotName)) return false;
 
     SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
-    if (skeletonData == null)
-      return;
+    if (skeletonData == null) return false;
 
-    var slotData = skeletonData.FindSlot(slotName);
-    if (slotData == null)
-      return;
+    SlotData slotData = skeletonData.FindSlot(slotName);
+    if (slotData == null) return false;
 
     int slotIndex = slotData.Index;
-    var skin = skeletonData.DefaultSkin;
-    if (skin == null)
-      return;
 
+    // Placeholder hiện tại vẫn hợp lệ với Skin nguồn đang chọn -> không đụng vào
+    if (!string.IsNullOrEmpty(attachmentName))
+    {
+      Skin currentSkin = string.IsNullOrEmpty(skinName) ? null : skeletonData.FindSkin(skinName);
+      if (currentSkin == null || currentSkin.GetAttachment(slotIndex, attachmentName) != null) return false;
+    }
+
+    var candidates = new List<string>();
     var entries = new List<Skin.SkinEntry>();
-    skin.GetAttachments(slotIndex, entries);
 
-    if (entries.Count > 0)
-      attachmentName = entries[0].Name;
+    Skin sourceSkin = string.IsNullOrEmpty(skinName) ? null : skeletonData.FindSkin(skinName);
+    if (sourceSkin != null)
+    {
+      sourceSkin.GetAttachments(slotIndex, entries);
+      for (int i = 0; i < entries.Count; i++)
+        if (!candidates.Contains(entries[i].Name)) candidates.Add(entries[i].Name);
+    }
+    else
+    {
+      // Chưa chọn Skin nguồn -> gom tên placeholder từ mọi Skin. Thường các Skin dùng
+      // CÙNG một tên placeholder cho cùng một slot, nên vẫn suy ra được chính xác.
+      for (int s = 0; s < skeletonData.Skins.Count; s++)
+      {
+        entries.Clear();
+        skeletonData.Skins.Items[s].GetAttachments(slotIndex, entries);
+        for (int i = 0; i < entries.Count; i++)
+          if (!candidates.Contains(entries[i].Name)) candidates.Add(entries[i].Name);
+      }
+    }
+
+    // Chỉ tự điền khi không nhập nhằng
+    if (candidates.Count != 1) return false;
+
+    attachmentName = candidates[0];
+    return true;
   }
 #endif
 }
