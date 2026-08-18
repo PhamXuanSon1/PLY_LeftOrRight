@@ -478,9 +478,9 @@ MonoBehaviour:
     equipmentData: {fileID: 11400000, guid: 8c69ff7cb2a561a48adb924cd2154431, type: 2}
   - character: {fileID: 594413118}
     equipmentData: {fileID: 11400000, guid: a83598c4657d20e4685cf5f9959dd844, type: 2}
-  character1: {fileID: 594413117}
-  targetTestCharacter: {fileID: 594413118}
-  testEquipmentDataAsset: {fileID: 11400000, guid: a83598c4657d20e4685cf5f9959dd844, type: 2}
+  character1: {fileID: 1174178232}
+  targetTestCharacter: {fileID: 1174178228}
+  testEquipmentDataAsset: {fileID: 11400000, guid: 8c69ff7cb2a561a48adb924cd2154431, type: 2}
   mySkinSet:
   - isEnabled: 0
     skinName: empty
@@ -506,10 +506,10 @@ MonoBehaviour:
   - isEnabled: 0
     skinName: face/face_christmast_6
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     skinName: face/face_haloween4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: face/face_Kpop_3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
@@ -518,13 +518,13 @@ MonoBehaviour:
   - isEnabled: 0
     skinName: hair/hair_christmast_6
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
+  - isEnabled: 1
     skinName: hair/hair_haloween4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     skinName: hair/hair_Kpop_1
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: hair/hair_Kpop_3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
@@ -536,7 +536,7 @@ MonoBehaviour:
   - isEnabled: 0
     skinName: shirt/shirt_haloween4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: shirt/shirt_Kpop_3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
@@ -551,7 +551,7 @@ MonoBehaviour:
   - isEnabled: 0
     skinName: shoe/shoe_Kpop_3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: shoe/shoe_rw_ad3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
@@ -560,10 +560,10 @@ MonoBehaviour:
   - isEnabled: 0
     skinName: skirt/skirt_haloween4
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: skirt/skirt_Kpop_3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 1
+  - isEnabled: 0
     skinName: skirt/skirt_rw_ad3
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
 --- !u!1 &366201870
