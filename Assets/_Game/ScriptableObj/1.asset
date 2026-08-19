@@ -16,18 +16,6 @@ MonoBehaviour:
   skinNames: []
   attachmentPairs:
   - isEnabled: 1
-    skinName: 
-    slotName: back Hair
-    attachmentName: 
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 2800000, guid: 8689c1e117a0b1d40a777444f64fd487, type: 3}
-  - isEnabled: 1
-    skinName: 
-    slotName: front_Hair
-    attachmentName: 
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 2800000, guid: 71169525cadf9da4b94984d315997571, type: 3}
-  - isEnabled: 1
     skinName: white
     slotName: arm_L
     attachmentName: arm_L
@@ -65,12 +53,6 @@ MonoBehaviour:
     customPreview: {fileID: 0}
   - isEnabled: 1
     skinName: white
-    slotName: hand_L
-    attachmentName: hand_L
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
     slotName: head
     attachmentName: head
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
@@ -101,12 +83,6 @@ MonoBehaviour:
     customPreview: {fileID: 0}
   - isEnabled: 1
     skinName: white
-    slotName: spread_hand_R
-    attachmentName: spread_hand_R
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
     slotName: thigh_L
     attachmentName: thigh_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
@@ -115,5 +91,29 @@ MonoBehaviour:
     skinName: white
     slotName: thigh_R
     attachmentName: thigh_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: back Hair
+    attachmentName: back Hair
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: front_Hair
+    attachmentName: front_Hair
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: hand_L
+    attachmentName: hand_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: hand_R
+    attachmentName: hand_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}

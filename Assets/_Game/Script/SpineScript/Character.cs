@@ -305,6 +305,37 @@ public class Character : Ply_GameUnit
             }
         }
 
+        // 2b. Gộp riêng các attachment phục vụ animation đưa tay (hands_left_up / hands_right_up) và nhắm mắt (face 1)
+        //     từ các Skin nguồn được tham chiếu bởi attachment pairs.
+        //     CHỈ copy các slot hand_up và face 1, KHÔNG copy các slot khác (áo, quần, tóc, mũ...)
+        //     để tránh bị bật các slot không mong muốn.
+        if (pairs != null)
+        {
+            HashSet<string> referencedSkins = new HashSet<string>();
+            for (int i = 0; i < pairs.Count; i++)
+            {
+                var pair = pairs[i];
+                if (pair == null || string.IsNullOrEmpty(pair.skinName)) continue;
+                if (!pair.isEnabled && string.IsNullOrEmpty(pair.attachmentName)) continue;
+                referencedSkins.Add(pair.skinName);
+            }
+
+            foreach (string refSkinName in referencedSkins)
+            {
+                Skin sourceSkin = skeletonData.FindSkin(refSkinName);
+                if (sourceSkin == null) continue;
+
+                foreach (Skin.SkinEntry entry in sourceSkin.Attachments)
+                {
+                    string slotName = skeletonData.Slots.Items[entry.SlotIndex].Name;
+                    if (IsAnimationHandOrFaceSlot(slotName))
+                    {
+                        customSkin.SetAttachment(entry.SlotIndex, entry.Name, entry.Attachment);
+                    }
+                }
+            }
+        }
+
         // 3. Gom danh sách override: pairs (ưu tiên cao nhất) + các slot bị ép ở runtime
         //    (item nhặt được, emotion...) mà pairs không nhắc tới.
         List<SlotAttachmentPair> overrides = new List<SlotAttachmentPair>();
@@ -379,6 +410,13 @@ public class Character : Ply_GameUnit
         {
             skeletonAnimation.LateUpdate();
         }
+    }
+
+    private static bool IsAnimationHandOrFaceSlot(string slotName)
+    {
+        if (string.IsNullOrEmpty(slotName)) return false;
+        return slotName.StartsWith("hand_up", System.StringComparison.OrdinalIgnoreCase)
+            || slotName.Equals("face 1", System.StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsStraightAlpha(Material material)

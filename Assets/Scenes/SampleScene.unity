@@ -369,12 +369,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 50
-  m_Sprite: {fileID: 21300000, guid: ef6f52e5176da194cb475e4fbc75cd00, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cdb8f37fdd5eb924d81069d6fe70aace, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 6.41, y: 5.92}
+  m_Size: {x: 1.75, y: 1.75}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -478,9 +478,9 @@ MonoBehaviour:
     equipmentData: {fileID: 11400000, guid: 8c69ff7cb2a561a48adb924cd2154431, type: 2}
   - character: {fileID: 594413118}
     equipmentData: {fileID: 11400000, guid: a83598c4657d20e4685cf5f9959dd844, type: 2}
-  character1: {fileID: 1174178232}
-  targetTestCharacter: {fileID: 1174178228}
-  testEquipmentDataAsset: {fileID: 11400000, guid: 8c69ff7cb2a561a48adb924cd2154431, type: 2}
+  character1: {fileID: 594413117}
+  targetTestCharacter: {fileID: 594413118}
+  testEquipmentDataAsset: {fileID: 11400000, guid: a83598c4657d20e4685cf5f9959dd844, type: 2}
   mySkinSet:
   - isEnabled: 0
     skinName: empty
@@ -520,9 +520,6 @@ MonoBehaviour:
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     skinName: hair/hair_haloween4
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-  - isEnabled: 0
-    skinName: hair/hair_Kpop_1
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   - isEnabled: 0
     skinName: hair/hair_Kpop_3
@@ -568,18 +565,6 @@ MonoBehaviour:
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
   myAttachmentSet:
   - isEnabled: 1
-    skinName: 
-    slotName: back Hair
-    attachmentName: 
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 2800000, guid: 8689c1e117a0b1d40a777444f64fd487, type: 3}
-  - isEnabled: 1
-    skinName: 
-    slotName: front_Hair
-    attachmentName: 
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 2800000, guid: 71169525cadf9da4b94984d315997571, type: 3}
-  - isEnabled: 1
     skinName: white
     slotName: arm_L
     attachmentName: arm_L
@@ -615,76 +600,10 @@ MonoBehaviour:
     attachmentName: forearm_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: hand 1
-    attachmentName: hand 1
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: hand_heart
-    attachmentName: hand_heart
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: hand_L
-    attachmentName: hand_L
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: hand_R
-    attachmentName: hand_R
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: hand_up_L
-    attachmentName: hand_up_L
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: hand_up_L1
-    attachmentName: hand_up_R1
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: hand_up_L2
-    attachmentName: hand_up_R1
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: hand_up_R
-    attachmentName: hand_up_R
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: hand_up_R1
-    attachmentName: hand_up_R1
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
   - isEnabled: 1
     skinName: white
     slotName: head
     attachmentName: head
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: heart_hand_L
-    attachmentName: heart_hand_L
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: heart_hand_R
-    attachmentName: heart_hand_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
   - isEnabled: 1
@@ -705,34 +624,10 @@ MonoBehaviour:
     attachmentName: leg_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: say_hi_L
-    attachmentName: say_hi_L
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: say_hi_R
-    attachmentName: say_hi_R
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
   - isEnabled: 1
     skinName: white
     slotName: shirt
     attachmentName: shirt
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: spread_hand_L
-    attachmentName: spread_hand_L
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: spread_hand_R
-    attachmentName: spread_hand_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
   - isEnabled: 1
@@ -747,7 +642,61 @@ MonoBehaviour:
     attachmentName: thigh_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
-  skinToSplit: face/face_haloween4
+  - isEnabled: 1
+    skinName: white
+    slotName: hand_up_L
+    attachmentName: hand_up_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: hand_up_R
+    attachmentName: hand_up_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: hair/hair_Kpop_3
+    slotName: hair1-back Hair
+    attachmentName: hair1/back Hair
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: hair/hair_Kpop_3
+    slotName: hair1-front_Hair
+    attachmentName: hair1/front_Hair
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: arm_L
+    attachmentName: arm_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: arm_R
+    attachmentName: arm_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: shirt_black4-forearm_L
+    attachmentName: shirt_black4/forearm_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: shirt_black4-forearm_R
+    attachmentName: shirt_black4/forearm_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: shirt_black4-shirt
+    attachmentName: shirt_black4/shirt
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  skinToSplit: white
 --- !u!1 &366201870
 GameObject:
   m_ObjectHideFlags: 0
@@ -1280,16 +1229,128 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 594413117}
   skeletonAnimation: {fileID: 594413119}
-  currentAppliedPairs: []
-  currentAppliedSkinNames:
-  - leg_white
-  - white
-  - face/face_Kpop_3
-  - hair/hair_Kpop_3
-  - shirt/shirt_Kpop_3
-  - shoe/shoe_rw_ad3
-  - skirt/skirt_Kpop_3
-  - skirt/skirt_rw_ad3
+  currentAppliedPairs:
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: arm_L
+    attachmentName: arm_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: arm_R
+    attachmentName: arm_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: face
+    attachmentName: face
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: face 1
+    attachmentName: face 1
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: forearm_L
+    attachmentName: forearm_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: forearm_R
+    attachmentName: forearm_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: head
+    attachmentName: head
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: hip
+    attachmentName: hip
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: leg_L
+    attachmentName: leg_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: leg_R
+    attachmentName: leg_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: shirt
+    attachmentName: shirt
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: thigh_L
+    attachmentName: thigh_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: thigh_R
+    attachmentName: thigh_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: hand_up_L
+    attachmentName: hand_up_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: hand_up_R
+    attachmentName: hand_up_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: hair/hair_Kpop_3
+    slotName: hair1-back Hair
+    attachmentName: hair1/back Hair
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: hair/hair_Kpop_3
+    slotName: hair1-front_Hair
+    attachmentName: hair1/front_Hair
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: shirt_black4-forearm_L
+    attachmentName: shirt_black4/forearm_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: shirt_black4-forearm_R
+    attachmentName: shirt_black4/forearm_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: shirt/shirt_Kpop_3
+    slotName: shirt_black4-shirt
+    attachmentName: shirt_black4/shirt
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  currentAppliedSkinNames: []
 --- !u!114 &594413119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1356,10 +1417,6 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8cb5eaf4ccdf2db4789f9dc25e223357, type: 2}
-  - {fileID: 2100000, guid: b81aa4a488de2a04790ad78f273eae4f, type: 2}
-  - {fileID: 2100000, guid: 8cb5eaf4ccdf2db4789f9dc25e223357, type: 2}
-  - {fileID: 2100000, guid: b81aa4a488de2a04790ad78f273eae4f, type: 2}
   - {fileID: 2100000, guid: 8cb5eaf4ccdf2db4789f9dc25e223357, type: 2}
   - {fileID: 2100000, guid: b81aa4a488de2a04790ad78f273eae4f, type: 2}
   - {fileID: 2100000, guid: 8cb5eaf4ccdf2db4789f9dc25e223357, type: 2}
@@ -2447,7 +2504,7 @@ MonoBehaviour:
   - {fileID: 839841327}
   - {fileID: 56029318}
   - {fileID: 1920235318}
-  maxSlotsToPlay: 3
+  maxSlotsToPlay: 4
   objectToHideOnFirstClick: {fileID: 1134152474}
   rightEffectPrefab: {fileID: 1321038350025484847, guid: 59e9a6802f326d94ea32824ce59d1a8b, type: 3}
   rightEffectSpawnPoint: {fileID: 99630757}
@@ -2591,18 +2648,6 @@ MonoBehaviour:
   skeletonAnimation: {fileID: 1174178229}
   currentAppliedPairs:
   - isEnabled: 1
-    skinName: 
-    slotName: back Hair
-    attachmentName: 
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 2800000, guid: 8689c1e117a0b1d40a777444f64fd487, type: 3}
-  - isEnabled: 1
-    skinName: 
-    slotName: front_Hair
-    attachmentName: 
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 2800000, guid: 71169525cadf9da4b94984d315997571, type: 3}
-  - isEnabled: 1
     skinName: white
     slotName: arm_L
     attachmentName: arm_L
@@ -2638,6 +2683,72 @@ MonoBehaviour:
     attachmentName: forearm_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: head
+    attachmentName: head
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: hip
+    attachmentName: hip
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: leg_L
+    attachmentName: leg_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: leg_R
+    attachmentName: leg_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: shirt
+    attachmentName: shirt
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 0
+    skinName: white
+    slotName: spread_hand_R
+    attachmentName: spread_hand_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: thigh_L
+    attachmentName: thigh_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: thigh_R
+    attachmentName: thigh_R
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: back Hair
+    attachmentName: back Hair
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 1
+    skinName: white
+    slotName: front_Hair
+    attachmentName: front_Hair
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
+  - isEnabled: 0
+    skinName: white
+    slotName: spread_hand_L
+    attachmentName: spread_hand_L
+    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
+    customPreview: {fileID: 0}
   - isEnabled: 0
     skinName: white
     slotName: hand 1
@@ -2656,7 +2767,7 @@ MonoBehaviour:
     attachmentName: hand_L
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
-  - isEnabled: 0
+  - isEnabled: 1
     skinName: white
     slotName: hand_R
     attachmentName: hand_R
@@ -2692,12 +2803,6 @@ MonoBehaviour:
     attachmentName: hand_up_R1
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: head
-    attachmentName: head
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
   - isEnabled: 0
     skinName: white
     slotName: heart_hand_L
@@ -2710,24 +2815,6 @@ MonoBehaviour:
     attachmentName: heart_hand_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: hip
-    attachmentName: hip
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: leg_L
-    attachmentName: leg_L
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: leg_R
-    attachmentName: leg_R
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
   - isEnabled: 0
     skinName: white
     slotName: say_hi_L
@@ -2738,36 +2825,6 @@ MonoBehaviour:
     skinName: white
     slotName: say_hi_R
     attachmentName: say_hi_R
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: shirt
-    attachmentName: shirt
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 0
-    skinName: white
-    slotName: spread_hand_L
-    attachmentName: spread_hand_L
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: spread_hand_R
-    attachmentName: spread_hand_R
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: thigh_L
-    attachmentName: thigh_L
-    skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
-    customPreview: {fileID: 0}
-  - isEnabled: 1
-    skinName: white
-    slotName: thigh_R
-    attachmentName: thigh_R
     skeletonDataAsset: {fileID: 11400000, guid: 417e9a397d2b59d41b7fc83eaa6d27a5, type: 2}
     customPreview: {fileID: 0}
   currentAppliedSkinNames: []
@@ -4911,12 +4968,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 50
-  m_Sprite: {fileID: 21300000, guid: 53938d268cc368c4cbe46f41a0279feb, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6d7810128511bc74982dfe4c7aadb95b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.99, y: 1.92}
+  m_Size: {x: 1.93, y: 1.83}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -7637,7 +7694,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 30
-  m_Sprite: {fileID: 21300000, guid: be2a2b013d1435841a8d579e51108e3f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4ab879b44eb0b08479459f3bb7392004, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

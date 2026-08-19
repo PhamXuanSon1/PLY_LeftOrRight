@@ -251,33 +251,12 @@ public class CharacterManager : MonoBehaviour
             return;
         }
 
-        if (myAttachmentSet == null) myAttachmentSet = new List<SlotAttachmentPair>();
-
-        int added = 0;
-        var skipped = new List<string>();
+        // Xoá sạch bảng, chỉ giữ các dòng của đúng skin đang tách
+        myAttachmentSet = new List<SlotAttachmentPair>();
 
         foreach (Skin.SkinEntry entry in skin.Attachments)
         {
             string slotName = skeletonData.Slots.Items[entry.SlotIndex].Name;
-
-            // KHÔNG đụng vào dòng đã có: giữ nguyên trạng thái tick, Skin nguồn và ảnh tự chọn
-            // mà bạn đã chỉnh tay. Mỗi slot chỉ được phép có 1 dòng override.
-            SlotAttachmentPair existing = null;
-            for (int i = 0; i < myAttachmentSet.Count; i++)
-            {
-                if (myAttachmentSet[i] != null && myAttachmentSet[i].slotName == slotName)
-                {
-                    existing = myAttachmentSet[i];
-                    break;
-                }
-            }
-
-            if (existing != null)
-            {
-                string owner = string.IsNullOrEmpty(existing.skinName) ? "(chưa có Skin nguồn)" : existing.skinName;
-                skipped.Add($"{slotName} ← đang thuộc '{owner}'{(existing.isEnabled ? "" : ", đang tắt")}");
-                continue;
-            }
 
             myAttachmentSet.Add(new SlotAttachmentPair
             {
@@ -287,17 +266,9 @@ public class CharacterManager : MonoBehaviour
                 attachmentName = entry.Name,
                 skeletonDataAsset = skeletonDataAsset
             });
-            added++;
         }
 
-        Debug.Log($"Đã tách Skin '{skinToSplit}': thêm {added} dòng mới (tổng {myAttachmentSet.Count}).");
-
-        if (skipped.Count > 0)
-        {
-            Debug.LogWarning($"Bỏ qua {skipped.Count} slot vì đã có dòng sẵn (giữ nguyên, không ghi đè):\n" +
-                             "   " + string.Join("\n   ", skipped) +
-                             "\nMuốn dùng phần của Skin mới thì xoá dòng cũ rồi Tách lại.");
-        }
+        Debug.Log($"Đã tách Skin '{skinToSplit}': {myAttachmentSet.Count} dòng.");
     }
 
     /// <summary>
@@ -471,8 +442,9 @@ public class CharacterManager : MonoBehaviour
         if (dataAsset != null) testEquipmentDataAsset.targetSkeletonDataAsset = dataAsset;
 
         // CHỈ lưu các dòng đang tick. Dòng bỏ tick coi như không dùng, không đưa vào file data.
-        testEquipmentDataAsset.attachmentPairs.Clear();
+        // KHÔNG xoá các attachment pair có sẵn trong data — chỉ thêm/cập nhật.
         var notSaved = new List<string>();
+        int updatedCount = 0, addedCount = 0;
 
         if (myAttachmentSet != null)
         {
@@ -495,22 +467,51 @@ public class CharacterManager : MonoBehaviour
                     continue;
                 }
 
-                testEquipmentDataAsset.attachmentPairs.Add(new SlotAttachmentPair
+                // Tìm dòng đã có cùng skinName + slotName trong data để cập nhật
+                SlotAttachmentPair existingInData = null;
+                for (int j = 0; j < testEquipmentDataAsset.attachmentPairs.Count; j++)
                 {
-                    isEnabled = pair.isEnabled,
-                    skinName = pair.skinName,
-                    slotName = pair.slotName,
-                    attachmentName = pair.attachmentName,
-                    customPreview = pair.customPreview,
-                    skeletonDataAsset = dataAsset
-                });
+                    var existing = testEquipmentDataAsset.attachmentPairs[j];
+                    if (existing != null
+                        && existing.slotName == pair.slotName
+                        && existing.skinName == pair.skinName)
+                    {
+                        existingInData = existing;
+                        break;
+                    }
+                }
+
+                if (existingInData != null)
+                {
+                    // Cập nhật dòng đã có
+                    existingInData.isEnabled = pair.isEnabled;
+                    existingInData.attachmentName = pair.attachmentName;
+                    existingInData.customPreview = pair.customPreview;
+                    existingInData.skeletonDataAsset = dataAsset;
+                    updatedCount++;
+                }
+                else
+                {
+                    // Thêm dòng mới
+                    testEquipmentDataAsset.attachmentPairs.Add(new SlotAttachmentPair
+                    {
+                        isEnabled = pair.isEnabled,
+                        skinName = pair.skinName,
+                        slotName = pair.slotName,
+                        attachmentName = pair.attachmentName,
+                        customPreview = pair.customPreview,
+                        skeletonDataAsset = dataAsset
+                    });
+                    addedCount++;
+                }
             }
         }
 
         UnityEditor.EditorUtility.SetDirty(testEquipmentDataAsset);
         UnityEditor.AssetDatabase.SaveAssets();
-        Debug.Log($"Đã lưu {testEquipmentDataAsset.skinNames.Count} skin + " +
-                  $"{testEquipmentDataAsset.attachmentPairs.Count} override vào Asset: {testEquipmentDataAsset.name}");
+        Debug.Log($"Đã lưu {testEquipmentDataAsset.skinNames.Count} skin, " +
+                  $"thêm {addedCount} dòng mới + cập nhật {updatedCount} dòng " +
+                  $"(tổng {testEquipmentDataAsset.attachmentPairs.Count} override) vào Asset: {testEquipmentDataAsset.name}");
 
         if (notSaved.Count > 0)
         {
