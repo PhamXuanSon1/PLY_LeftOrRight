@@ -22,10 +22,16 @@ public class ProgressTrackingManager : MonoBehaviour
 
     private void Awake()
     {
+        AppLovinAnalytics.Track(ALEvent.LOADING);
         if (Instance == null)
         {
             Instance = this;
         }
+    }
+    void Start()
+    {
+        AppLovinAnalytics.Track(ALEvent.LOADED);
+        AppLovinAnalytics.Track(ALEvent.DISPLAYED); 
     }
 
     /// <summary>
@@ -47,8 +53,6 @@ public class ProgressTrackingManager : MonoBehaviour
         // Bắn event Started ngay lần đầu tiên user hoàn thành 1 item
         if (!isStarted && currentScore > 0)
         {
-            // AppLovinAnalytics.TrackChallengeStarted();
-            Debug.Log("Track: Challenge Started");
             isStarted = true;
         }
         
@@ -59,29 +63,28 @@ public class ProgressTrackingManager : MonoBehaviour
 
         if (progressPercent >= 25 && !pass25)
         {
-            // AppLovinAnalytics.TrackChallengePass25();
-            Debug.Log("Track: Challenge Pass 25%");
+        AppLovinAnalytics.Track(ALEvent.CHALLENGE_PASS_25); 
             pass25 = true;
         }
 
         if (progressPercent >= 50 && !pass50)
         {
-            // AppLovinAnalytics.TrackChallengePass50();
-            Debug.Log("Track: Challenge Pass 50%");
+        AppLovinAnalytics.Track(ALEvent.CHALLENGE_PASS_50); 
+
             pass50 = true;
         }
 
         if (progressPercent >= 75 && !pass75)
         {
+        AppLovinAnalytics.Track(ALEvent.CHALLENGE_PASS_75); 
             
-            Debug.Log("Track: Challenge Pass 75%");
             pass75 = true;
         }
 
         if (progressPercent >= 100 && !pass100)
         {
+        AppLovinAnalytics.Track(ALEvent.CHALLENGE_SOLVED); 
             
-            Debug.Log("Track: Challenge Solved 100%");
             pass100 = true;
         }
     }

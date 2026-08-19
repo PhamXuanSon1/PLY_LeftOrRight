@@ -128,7 +128,9 @@
             ],
             "includes": [
                 "Assets/Resources/DOTweenSettings.asset",
-                "Assets/TextMesh Pro/Resources/TMP Settings.asset"
+                "Assets/TextMesh Pro/Resources/TMP Settings.asset",
+                "Assets/_Game/Font/Super Beatpop SDF.asset",
+                "Assets/_Game/Font/Super Beatpop.ttf"
             ]
         },
         "scenes": [
@@ -7370,10 +7372,6 @@
                 "excluded": true
             },
             {
-                "name": "DG.Tweening.Core.SequenceCallback",
-                "excluded": true
-            },
-            {
                 "name": "DG.Tweening.DOTweenPath",
                 "excluded": true
             },
@@ -9295,6 +9293,10 @@
             },
             {
                 "name": "Spine.Pool$1.IPoolable",
+                "excluded": false
+            },
+            {
+                "name": "ALEvent",
                 "excluded": false
             }
         ],
@@ -11959,7 +11961,7 @@
                     },
                     {
                         "name": "ctor",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "GetEnumerator",
@@ -11967,7 +11969,7 @@
                     },
                     {
                         "name": "System$Collections$Generic$IEnumerable$1$GetEnumerator",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "System$Collections$IEnumerable$GetEnumerator",
@@ -12915,7 +12917,7 @@
                     },
                     {
                         "name": "GetEnumerator",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "System$Collections$Generic$IEnumerable$1$GetEnumerator",
@@ -13071,7 +13073,7 @@
                     },
                     {
                         "name": "Current#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "System$Collections$IEnumerator$Current#get",
@@ -13079,11 +13081,11 @@
                     },
                     {
                         "name": "init",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "$ctor1",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "ctor",
@@ -13091,11 +13093,11 @@
                     },
                     {
                         "name": "Dispose",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "moveNext",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "System$Collections$IEnumerator$reset",
@@ -32375,7 +32377,7 @@
                     },
                     {
                         "name": "AppendCallback",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "PrependCallback",
@@ -32663,7 +32665,7 @@
                     },
                     {
                         "name": "DoInsertCallback",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "init",
@@ -32900,6 +32902,10 @@
                     {
                         "name": "UpdateGameProgress",
                         "excluded": false
+                    },
+                    {
+                        "name": "Start",
+                        "excluded": false
                     }
                 ]
             },
@@ -33051,10 +33057,22 @@
                 "instanceMethods": [
                     {
                         "name": "init",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "GetSlotNames",
+                        "excluded": true
+                    },
+                    {
+                        "name": "ResolvedPlaceholderName#get",
+                        "excluded": false
+                    },
+                    {
+                        "name": "GetSkeletonData",
+                        "excluded": true
+                    },
+                    {
+                        "name": "GetPlaceholderNames",
                         "excluded": true
                     }
                 ]
@@ -34059,7 +34077,7 @@
                     },
                     {
                         "name": "SetAttachment",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "FindIkConstraint",
@@ -34341,7 +34359,7 @@
                     },
                     {
                         "name": "FindSlot",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "FindSkin",
@@ -34397,7 +34415,7 @@
                     },
                     {
                         "name": "Attachments#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "Bones#get",
@@ -34463,15 +34481,15 @@
                     },
                     {
                         "name": "SlotIndex#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "Name#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "Attachment#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "$ctor1",
@@ -34635,7 +34653,7 @@
                 "instanceMethods": [
                     {
                         "name": "Index#get",
-                        "excluded": true
+                        "excluded": false
                     },
                     {
                         "name": "Name#get",
@@ -35280,10 +35298,6 @@
                         "excluded": false
                     },
                     {
-                        "name": "EquipFromSlotAttachmentPairs",
-                        "excluded": true
-                    },
-                    {
                         "name": "TurnSlotAttachment",
                         "excluded": true
                     },
@@ -35317,6 +35331,62 @@
                     },
                     {
                         "name": "ApplyLunaSafeSettings",
+                        "excluded": false
+                    },
+                    {
+                        "name": "UpsertPair",
+                        "excluded": false
+                    },
+                    {
+                        "name": "IsAnimationHandOrFaceSlot",
+                        "excluded": false
+                    },
+                    {
+                        "name": "IsStraightAlpha",
+                        "excluded": true
+                    },
+                    {
+                        "name": "GetAttachmentMaterial",
+                        "excluded": true
+                    },
+                    {
+                        "name": "HasEquipmentToReapply#get",
+                        "excluded": false
+                    },
+                    {
+                        "name": "ReapplyCurrentEquipment",
+                        "excluded": true
+                    },
+                    {
+                        "name": "AddAttachmentOverride",
+                        "excluded": true
+                    },
+                    {
+                        "name": "RemoveAttachmentOverride",
+                        "excluded": true
+                    },
+                    {
+                        "name": "MergeAttachmentIntoCustomSkin",
+                        "excluded": false
+                    },
+                    {
+                        "name": "CreateAttachmentFromTexture",
+                        "excluded": true
+                    },
+                    {
+                        "name": "GetAtlasMaterial",
+                        "excluded": true
+                    },
+                    {
+                        "name": "ApplyCustomTexture",
+                        "excluded": false
+                    },
+                    {
+                        "name": "GetOrCreateCustomRegion",
+                        "excluded": true
+                    },
+                    {
+                        "name": "ForceSlotAttachment",
                         "excluded": false
                     }
                 ]
@@ -39128,6 +39198,26 @@
                         "excluded": false
                     }
                 ]
+            },
+            {
+                "className": "AppLovinAnalytics",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "Track",
+                        "excluded": false
+                    }
+                ]
+            },
+            {
+                "className": "DG.Tweening.Core.SequenceCallback",
+                "staticMethods": [],
+                "instanceMethods": [
+                    {
+                        "name": "ctor",
+                        "excluded": false
+                    }
+                ]
             }
         ],
         "stubberDataList": [],
@@ -39298,6 +39388,16 @@
                         "script": "",
                         "ext": "",
                         "name": "Assets/_Game/Sound/bgm/Lady Gaga - Bloody Mary (TikTok Remix Speed Up) Wednesday Dance Scene - itsAirLow (youtube) (mp3cut.net).mp3"
+                    },
+                    {
+                        "channels": 1,
+                        "startTime": "00:00.000",
+                        "endTime": "00:30.000",
+                        "lengthInSeconds": 30.0,
+                        "bitrate": 64,
+                        "script": "",
+                        "ext": "",
+                        "name": "Assets/_Game/Sound/bgm/Shakira - Zoo (Dance remix) From Zootopia 2 - EDM COVER (youtube) (mp3cut.net).mp3"
                     }
                 ]
             },

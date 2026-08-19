@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Spine;
 using Spine.Unity;
+using Spine.Unity.AttachmentTools;
 using UnityEngine;
 
 
@@ -26,6 +27,12 @@ public class Character : Ply_GameUnit
     private Dictionary<string, string> forcedAttachments = new Dictionary<string, string>();
     private List<string> forcedAttachmentKeys = new List<string>();
 
+    // Nhớ luôn Skin nguồn của từng slot bị ép, vì cùng một Skin Placeholder có thể tồn tại ở nhiều Skin
+    private Dictionary<string, string> forcedSourceSkins = new Dictionary<string, string>();
+
+
+    private static readonly int StraightAlphaProperty = Shader.PropertyToID("_StraightAlphaInput");
+
     private void OnEnable()
     {
         if (skeletonAnimation != null)
@@ -47,9 +54,7 @@ public class Character : Ply_GameUnit
 
     private void OnSkeletonRebuild(SkeletonRenderer renderer)
     {
-        bool hasSkins = currentAppliedSkinNames != null && currentAppliedSkinNames.Count > 0;
-        bool hasPairs = currentAppliedPairs != null && currentAppliedPairs.Count > 0;
-        if (!hasSkins && !hasPairs) return;
+        if (!HasEquipmentToReapply) return;
 
         ApplyLunaSafeSettings();
 
@@ -71,9 +76,7 @@ public class Character : Ply_GameUnit
     {
         if (this == null || skeletonAnimation == null || skeletonAnimation.Skeleton == null) return;
 
-        bool hasSkins = currentAppliedSkinNames != null && currentAppliedSkinNames.Count > 0;
-        bool hasPairs = currentAppliedPairs != null && currentAppliedPairs.Count > 0;
-        if (!hasSkins && !hasPairs) return;
+        if (!HasEquipmentToReapply) return;
 
         // Gọi thẳng hàm Mix mới với cả 2 danh sách
         ApplySkinsAndAttachmentsMix(currentAppliedSkinNames, currentAppliedPairs);
@@ -169,13 +172,11 @@ public class Character : Ply_GameUnit
         {
             for (int i = 0; i < attachmentPairs.Count; i++)
             {
-                currentAppliedPairs.Add(new SlotAttachmentPair
-                {
-                    isEnabled = attachmentPairs[i].isEnabled,
-                    slotName = attachmentPairs[i].slotName,
-                    attachmentName = attachmentPairs[i].attachmentName,
-                    skeletonDataAsset = attachmentPairs[i].skeletonDataAsset
-                });
+                var source = attachmentPairs[i];
+                if (source == null || string.IsNullOrEmpty(source.slotName)) continue;
+
+                UpsertPair(currentAppliedPairs, source.skinName, source.slotName, source.attachmentName,
+                    source.isEnabled, source.skeletonDataAsset, source.customPreview);
             }
         }
 
@@ -186,6 +187,93 @@ public class Character : Ply_GameUnit
         ApplySkinsAndAttachmentsMix(currentAppliedSkinNames, currentAppliedPairs);
     }
 
+    /// <summary>
+    /// Có bộ đồ nào đang được lưu để đắp lại hay không.
+    /// </summary>
+    public bool HasEquipmentToReapply =>
+        (currentAppliedSkinNames != null && currentAppliedSkinNames.Count > 0) ||
+        (currentAppliedPairs != null && currentAppliedPairs.Count > 0);
+
+    /// <summary>
+    /// Đắp lại đúng bộ đồ đang lưu (skin nền + các override). Dùng sau khi Skeleton bị rebuild.
+    /// </summary>
+    public void ReapplyCurrentEquipment()
+    {
+        ApplySkinsAndAttachmentsMix(currentAppliedSkinNames, currentAppliedPairs);
+    }
+
+    /// <summary>
+    /// Thêm / cập nhật một override cho 1 slot rồi đắp lại ngay.
+    /// Dùng cho item nhặt được lúc chơi.
+    /// </summary>
+    /// <param name="sourceSkinName">Skin chứa placeholder này. Nên điền, vì cùng một placeholder
+    /// (ví dụ "face", "hair1/front_Hair") có mặt ở nhiều Skin khác nhau.</param>
+    /// <param name="customTexture">Ảnh PNG rời dùng thay cho hình gốc. Để null nếu dùng hình trong atlas.</param>
+    public void AddAttachmentOverride(string sourceSkinName, string slotName, string placeholderName,
+        bool enabled = true, Texture2D customTexture = null)
+    {
+        if (string.IsNullOrEmpty(slotName)) return;
+
+        if (currentAppliedPairs == null) currentAppliedPairs = new List<SlotAttachmentPair>();
+        UpsertPair(currentAppliedPairs, sourceSkinName, slotName, placeholderName, enabled,
+            skeletonAnimation != null ? skeletonAnimation.SkeletonDataAsset : null, customTexture);
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying) UnityEditor.EditorUtility.SetDirty(this);
+#endif
+
+        ApplySkinsAndAttachmentsMix(currentAppliedSkinNames, currentAppliedPairs);
+    }
+
+    /// <summary>
+    /// Bỏ override của 1 slot, trả slot đó về đúng những gì Skin nền quy định.
+    /// </summary>
+    public void RemoveAttachmentOverride(string slotName)
+    {
+        if (string.IsNullOrEmpty(slotName) || currentAppliedPairs == null) return;
+
+        for (int i = currentAppliedPairs.Count - 1; i >= 0; i--)
+        {
+            if (currentAppliedPairs[i] != null && currentAppliedPairs[i].slotName == slotName)
+                currentAppliedPairs.RemoveAt(i);
+        }
+
+        if (forcedAttachments.Remove(slotName)) forcedAttachmentKeys.Remove(slotName);
+        forcedSourceSkins.Remove(slotName);
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying) UnityEditor.EditorUtility.SetDirty(this);
+#endif
+
+        ApplySkinsAndAttachmentsMix(currentAppliedSkinNames, currentAppliedPairs);
+    }
+
+    private static void UpsertPair(List<SlotAttachmentPair> list, string skinName, string slotName,
+        string placeholderName, bool enabled, SkeletonDataAsset dataAsset, Texture2D customTexture)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i] == null || list[i].slotName != slotName) continue;
+
+            list[i].isEnabled = enabled;
+            list[i].skinName = skinName;
+            list[i].attachmentName = placeholderName;
+            list[i].customPreview = customTexture;
+            if (dataAsset != null) list[i].skeletonDataAsset = dataAsset;
+            return;
+        }
+
+        list.Add(new SlotAttachmentPair
+        {
+            isEnabled = enabled,
+            skinName = skinName,
+            slotName = slotName,
+            attachmentName = placeholderName,
+            customPreview = customTexture,
+            skeletonDataAsset = dataAsset
+        });
+    }
+
     private void ApplySkinsAndAttachmentsMix(List<string> skinNames, List<SlotAttachmentPair> pairs)
     {
         if (skeletonAnimation == null || skeletonAnimation.Skeleton == null) return;
@@ -194,13 +282,13 @@ public class Character : Ply_GameUnit
         var skeletonData = skeleton.Data;
         customSkin = new Skin("custom-mix");
 
-        // 1. Gộp Default Skin
+        // 1. Gộp Default Skin (lớp nền)
         if (skeletonData.DefaultSkin != null)
             customSkin.AddSkin(skeletonData.DefaultSkin);
 
         HashSet<string> addedSkinNames = new HashSet<string>();
 
-        // 2. Gộp các Skin từ danh sách tên
+        // 2. Gộp các Skin nền từ danh sách tên
         if (skinNames != null)
         {
             for (int i = 0; i < skinNames.Count; i++)
@@ -217,68 +305,101 @@ public class Character : Ply_GameUnit
             }
         }
 
-        // 3. Quét các Attachment, tìm Skin chứa chúng và gộp vào (nếu chưa có)
+        // 2b. Gộp riêng các attachment phục vụ animation đưa tay (hands_left_up / hands_right_up) và nhắm mắt (face 1)
+        //     từ các Skin nguồn được tham chiếu bởi attachment pairs.
+        //     CHỈ copy các slot hand_up và face 1, KHÔNG copy các slot khác (áo, quần, tóc, mũ...)
+        //     để tránh bị bật các slot không mong muốn.
         if (pairs != null)
         {
+            HashSet<string> referencedSkins = new HashSet<string>();
             for (int i = 0; i < pairs.Count; i++)
             {
                 var pair = pairs[i];
-                if (!pair.isEnabled || string.IsNullOrEmpty(pair.attachmentName)) continue;
+                if (pair == null || string.IsNullOrEmpty(pair.skinName)) continue;
+                if (!pair.isEnabled && string.IsNullOrEmpty(pair.attachmentName)) continue;
+                referencedSkins.Add(pair.skinName);
+            }
 
-                SlotData slotData = skeletonData.FindSlot(pair.slotName);
-                if (slotData == null) continue;
-                int slotIndex = slotData.Index;
+            foreach (string refSkinName in referencedSkins)
+            {
+                Skin sourceSkin = skeletonData.FindSkin(refSkinName);
+                if (sourceSkin == null) continue;
 
-                for (int s = 0; s < skeletonData.Skins.Count; s++)
+                foreach (Skin.SkinEntry entry in sourceSkin.Attachments)
                 {
-                    Skin skin = skeletonData.Skins.Items[s];
-                    Attachment attachment = skin.GetAttachment(slotIndex, pair.attachmentName);
-                    if (attachment != null)
+                    string slotName = skeletonData.Slots.Items[entry.SlotIndex].Name;
+                    if (IsAnimationHandOrFaceSlot(slotName))
                     {
-                        if (!addedSkinNames.Contains(skin.Name))
-                        {
-                            customSkin.AddSkin(skin);
-                            addedSkinNames.Add(skin.Name);
-                        }
-                        break;
+                        customSkin.SetAttachment(entry.SlotIndex, entry.Name, entry.Attachment);
                     }
                 }
             }
         }
 
-        // 4. Đắp tổng hợp Skin lên nhân vật
-        skeleton.SetSkin(customSkin);
-        skeleton.SetSlotsToSetupPose();
+        // 3. Gom danh sách override: pairs (ưu tiên cao nhất) + các slot bị ép ở runtime
+        //    (item nhặt được, emotion...) mà pairs không nhắc tới.
+        List<SlotAttachmentPair> overrides = new List<SlotAttachmentPair>();
+        HashSet<string> overriddenSlots = new HashSet<string>();
 
-        // 5. Ép bật/tắt chính xác các attachment theo danh sách pairs
         if (pairs != null)
         {
             for (int i = 0; i < pairs.Count; i++)
             {
                 var pair = pairs[i];
-                if (!string.IsNullOrEmpty(pair.slotName))
-                {
-                    try
-                    {
-                        if (pair.isEnabled && !string.IsNullOrEmpty(pair.attachmentName))
-                        {
-                            skeleton.SetAttachment(pair.slotName, pair.attachmentName);
-                            if (!forcedAttachments.ContainsKey(pair.slotName)) forcedAttachmentKeys.Add(pair.slotName);
-                            forcedAttachments[pair.slotName] = pair.attachmentName;
-                        }
-                        else
-                        {
-                            skeleton.SetAttachment(pair.slotName, null);
-                            if (!forcedAttachments.ContainsKey(pair.slotName)) forcedAttachmentKeys.Add(pair.slotName);
-                            forcedAttachments[pair.slotName] = null;
-                        }
-                    }
-                    catch (System.Exception)
-                    {
-                        // Ignore if slot or attachment not found
-                    }
-                }
+                if (pair == null || string.IsNullOrEmpty(pair.slotName)) continue;
+
+                // Bỏ tick = không dùng dòng này. Slot giữ nguyên theo Skin nền.
+                // Dòng chỉ có ảnh rời (chưa chọn placeholder) vẫn hợp lệ: lấy tên file ảnh làm placeholder.
+                if (!pair.isEnabled || string.IsNullOrEmpty(pair.ResolvedPlaceholderName)) continue;
+
+                if (!overriddenSlots.Add(pair.slotName)) continue;
+                overrides.Add(pair);
             }
+        }
+
+        for (int i = 0; i < forcedAttachmentKeys.Count; i++)
+        {
+            string slotName = forcedAttachmentKeys[i];
+            if (string.IsNullOrEmpty(slotName) || overriddenSlots.Contains(slotName)) continue;
+
+            string attachmentName;
+            if (!forcedAttachments.TryGetValue(slotName, out attachmentName)) continue;
+
+            overriddenSlots.Add(slotName);
+            overrides.Add(new SlotAttachmentPair
+            {
+                isEnabled = !string.IsNullOrEmpty(attachmentName),
+                skinName = forcedSourceSkins.TryGetValue(slotName, out var forcedSkin) ? forcedSkin : null,
+                slotName = slotName,
+                attachmentName = attachmentName
+            });
+        }
+
+        // 4. Nhặt CHÍNH XÁC từng Skin Placeholder cần dùng từ đúng Skin nguồn của nó.
+        //    Không AddSkin cả bộ để tránh kéo theo đồ lạ ở các slot khác.
+        for (int i = 0; i < overrides.Count; i++)
+        {
+            var pair = overrides[i];
+            if (!pair.isEnabled || string.IsNullOrEmpty(pair.ResolvedPlaceholderName)) continue;
+
+            SlotData slotData = skeletonData.FindSlot(pair.slotName);
+            if (slotData == null) continue;
+
+            MergeAttachmentIntoCustomSkin(skeletonData, pair.skinName, slotData.Index, pair.attachmentName,
+                pair.customPreview);
+        }
+
+        // 5. Đắp tổng hợp Skin lên nhân vật
+        skeleton.SetSkin(customSkin);
+        skeleton.SetSlotsToSetupPose();
+
+        // 6. Ép bật/tắt chính xác từng slot theo danh sách override
+        for (int i = 0; i < overrides.Count; i++)
+        {
+            var pair = overrides[i];
+            string placeholderName = pair.ResolvedPlaceholderName;
+            bool turnOn = pair.isEnabled && !string.IsNullOrEmpty(placeholderName);
+            ForceSlotAttachment(skeleton, pair.slotName, turnOn ? placeholderName : null, pair.skinName);
         }
 
         if (Application.isPlaying)
@@ -291,6 +412,237 @@ public class Character : Ply_GameUnit
         }
     }
 
+    private static bool IsAnimationHandOrFaceSlot(string slotName)
+    {
+        if (string.IsNullOrEmpty(slotName)) return false;
+        return slotName.StartsWith("hand_up", System.StringComparison.OrdinalIgnoreCase)
+            || slotName.Equals("face 1", System.StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsStraightAlpha(Material material)
+    {
+        return material.HasProperty(StraightAlphaProperty) && material.GetFloat(StraightAlphaProperty) > 0.5f;
+    }
+
+    /// <summary>
+    /// Copy đúng MỘT Skin Placeholder (slot + placeholder) từ Skin nguồn vào customSkin.
+    /// Bắt buộc phải có sourceSkinName khi placeholder trùng tên ở nhiều Skin — nếu để trống,
+    /// hàm sẽ quét lần lượt và lấy Skin đầu tiên khớp (dễ ra nhầm hình).
+    /// </summary>
+    private bool MergeAttachmentIntoCustomSkin(SkeletonData skeletonData, string sourceSkinName, int slotIndex,
+        string placeholderName, Texture2D customTexture = null)
+    {
+        if (string.IsNullOrEmpty(placeholderName)) return false;
+
+        string slotDisplayName = skeletonData.Slots.Items[slotIndex].Name;
+
+        // Có chỉ định Skin nguồn -> lấy chính xác từ đó
+        if (!string.IsNullOrEmpty(sourceSkinName))
+        {
+            Skin sourceSkin = skeletonData.FindSkin(sourceSkinName);
+            if (sourceSkin == null)
+            {
+                Debug.LogWarning($"[{name}] Không tìm thấy Skin '{sourceSkinName}'.");
+                return false;
+            }
+
+            Attachment sourceAttachment = sourceSkin.GetAttachment(slotIndex, placeholderName);
+            if (sourceAttachment == null)
+            {
+                // Không có hình gốc, nhưng nếu có ảnh rời thì vẫn dựng được attachment mới
+                if (customTexture != null)
+                    return CreateAttachmentFromTexture(customTexture, slotIndex, placeholderName);
+
+                Debug.LogWarning($"[{name}] Skin '{sourceSkinName}' không có placeholder '{placeholderName}' " +
+                                 $"ở slot '{slotDisplayName}'.");
+                return false;
+            }
+
+            customSkin.SetAttachment(slotIndex, placeholderName,
+                ApplyCustomTexture(sourceAttachment, customTexture));
+            return true;
+        }
+
+        // Không chỉ định Skin nguồn -> quét toàn bộ, cảnh báo nếu nhập nhằng
+        Attachment found = null;
+        string foundSkinName = null;
+
+        for (int s = 0; s < skeletonData.Skins.Count; s++)
+        {
+            Skin skin = skeletonData.Skins.Items[s];
+            Attachment attachment = skin.GetAttachment(slotIndex, placeholderName);
+            if (attachment == null) continue;
+
+            if (found == null)
+            {
+                found = attachment;
+                foundSkinName = skin.Name;
+                continue;
+            }
+
+            Debug.LogWarning($"[{name}] Placeholder '{placeholderName}' ở slot " +
+                             $"'{slotDisplayName}' có mặt ở nhiều Skin " +
+                             $"(ví dụ '{foundSkinName}' và '{skin.Name}'). Hãy điền Skin Nguồn để chọn đúng hình.");
+            break;
+        }
+
+        if (found == null)
+        {
+            // Slot rỗng (không Skin nào có hình cho nó). Đây là trường hợp gắn art hoàn toàn mới
+            // từ file PNG rời — dựng thẳng RegionAttachment thay vì báo lỗi.
+            if (customTexture != null)
+                return CreateAttachmentFromTexture(customTexture, slotIndex, placeholderName);
+
+            return false;
+        }
+
+        customSkin.SetAttachment(slotIndex, placeholderName, ApplyCustomTexture(found, customTexture));
+        return true;
+    }
+
+    /// <summary>
+    /// Tạo attachment mới hoàn toàn từ một file ảnh rời, dùng cho slot chưa có hình ở bất kỳ Skin nào.
+    /// </summary>
+    private bool CreateAttachmentFromTexture(Texture2D customTexture, int slotIndex, string placeholderName)
+    {
+        Material sourceMaterial = GetAtlasMaterial();
+        if (sourceMaterial == null)
+        {
+            Debug.LogWarning($"[{name}] Không lấy được Material của atlas nên chưa gắn được ảnh " +
+                             $"'{customTexture.name}'.");
+            return false;
+        }
+
+        AtlasRegion region = GetOrCreateCustomRegion(customTexture, sourceMaterial);
+        if (region == null) return false;
+
+        float scale = skeletonAnimation != null && skeletonAnimation.SkeletonDataAsset != null
+            ? skeletonAnimation.SkeletonDataAsset.scale
+            : 0.01f;
+
+        RegionAttachment attachment = region.ToRegionAttachment(placeholderName, scale);
+        if (attachment == null) return false;
+
+        customSkin.SetAttachment(slotIndex, placeholderName, attachment);
+        return true;
+    }
+
+    /// <summary>
+    /// Material của atlas Spine, dùng làm nguồn shader/thuộc tính cho ảnh rời.
+    /// </summary>
+    private Material GetAtlasMaterial()
+    {
+        var dataAsset = skeletonAnimation != null ? skeletonAnimation.SkeletonDataAsset : null;
+        if (dataAsset == null || dataAsset.atlasAssets == null) return null;
+
+        for (int i = 0; i < dataAsset.atlasAssets.Length; i++)
+        {
+            var atlasAsset = dataAsset.atlasAssets[i];
+            if (atlasAsset != null && atlasAsset.PrimaryMaterial != null) return atlasAsset.PrimaryMaterial;
+        }
+
+        return null;
+    }
+
+    // Cache region đã dựng từ ảnh thay thế: (texture, material) -> AtlasRegion.
+    // Nếu không cache thì mỗi lần đắp đồ lại tạo thêm 1 Texture2D + 1 Material -> rò rỉ bộ nhớ.
+    private static Dictionary<long, AtlasRegion> customRegionCache = new Dictionary<long, AtlasRegion>();
+
+    /// <summary>
+    /// Nếu dòng có gán Ảnh Thay Thế thì dựng bản sao của attachment dùng ảnh đó.
+    /// MeshAttachment được clone dạng linked mesh nên vẫn ăn theo animation biến dạng của bản gốc.
+    /// </summary>
+    private Attachment ApplyCustomTexture(Attachment original, Texture2D customTexture)
+    {
+        if (original == null || customTexture == null) return original;
+
+        Material sourceMaterial = GetAttachmentMaterial(original);
+        if (sourceMaterial == null)
+        {
+            Debug.LogWarning($"[{name}] Không lấy được Material gốc của attachment '{original.Name}', " +
+                             "bỏ qua ảnh thay thế.");
+            return original;
+        }
+
+        AtlasRegion region = GetOrCreateCustomRegion(customTexture, sourceMaterial);
+        if (region == null) return original;
+
+        // useOriginalRegionSize = true: giữ đúng kích thước của attachment gốc, không phình theo pixel của ảnh mới
+        return original.GetRemappedClone(region, cloneMeshAsLinked: true, useOriginalRegionSize: true);
+    }
+
+    /// <summary>
+    /// Dựng (và cache) AtlasRegion từ một ảnh rời, chọn đúng cách xử lý alpha theo material của atlas.
+    /// </summary>
+    private AtlasRegion GetOrCreateCustomRegion(Texture2D customTexture, Material sourceMaterial)
+    {
+        long cacheKey = ((long)customTexture.GetInstanceID() << 32) ^ (uint)sourceMaterial.GetInstanceID();
+
+        AtlasRegion region;
+        if (customRegionCache.TryGetValue(cacheKey, out region) && region != null) return region;
+
+        if (IsStraightAlpha(sourceMaterial))
+        {
+            // Material của atlas đang bật Straight Alpha Input -> shader tự xử lý alpha,
+            // KHÔNG được nhân alpha trước, nếu không ảnh sẽ bị tối đi.
+            // Đường này cũng không cần ảnh bật Read/Write.
+            region = customTexture.ToAtlasRegion(sourceMaterial);
+        }
+        else if (customTexture.isReadable)
+        {
+            // Atlas dùng premultiplied alpha -> phải nhân alpha vào màu cho khớp
+            region = customTexture.ToAtlasRegionPMAClone(sourceMaterial);
+        }
+        else
+        {
+            Debug.LogWarning($"[{name}] Atlas dùng premultiplied alpha nhưng ảnh '{customTexture.name}' " +
+                             "chưa bật Read/Write Enabled nên không chuyển sang PMA được. " +
+                             "Ảnh vẫn hiện nhưng viền có thể bị sáng/tối bất thường. " +
+                             "Vào Import Settings của ảnh và tick Read/Write Enabled.");
+            region = customTexture.ToAtlasRegion(sourceMaterial);
+        }
+
+        customRegionCache[cacheKey] = region;
+        return region;
+    }
+
+    private static Material GetAttachmentMaterial(Attachment attachment)
+    {
+        AtlasRegion region = null;
+        if (attachment is RegionAttachment regionAttachment)
+            region = regionAttachment.Region as AtlasRegion;
+        else if (attachment is MeshAttachment meshAttachment)
+            region = meshAttachment.Region as AtlasRegion;
+
+        if (region == null || region.page == null) return null;
+        return region.page.rendererObject as Material;
+    }
+
+    /// <summary>
+    /// Set Skin Placeholder cho slot và ghi nhớ vào bảng forcedAttachments để đắp lại sau mỗi lần mix.
+    /// </summary>
+    private void ForceSlotAttachment(Skeleton skeleton, string slotName, string placeholderName,
+        string sourceSkinName)
+    {
+        if (skeleton == null || string.IsNullOrEmpty(slotName)) return;
+
+        try
+        {
+            skeleton.SetAttachment(slotName, placeholderName);
+        }
+        catch (System.Exception)
+        {
+            // Bỏ qua nếu slot hoặc placeholder không tồn tại
+            return;
+        }
+
+        if (!forcedAttachments.ContainsKey(slotName)) forcedAttachmentKeys.Add(slotName);
+        forcedAttachments[slotName] = placeholderName;
+
+        if (string.IsNullOrEmpty(sourceSkinName)) forcedSourceSkins.Remove(slotName);
+        else forcedSourceSkins[slotName] = sourceSkinName;
+    }
+
     private void RefreshSkeletonAndRender()
     {
         if (skeletonAnimation == null || skeletonAnimation.Skeleton == null) return;
@@ -301,136 +653,9 @@ public class Character : Ply_GameUnit
         ApplyLunaSafeSettings();
     }
 
-    // ===== API CHO BẢNG SlotAttachmentPair =====
-
-    /// <summary>
-    /// Mặc đồ từ bảng SlotAttachmentPair (Is Enabled, Slot Name, Attachment Name).
-    /// Quét tất cả các Skin trong file Spine để tìm attachment tương ứng, gộp lại và đắp lên nhân vật.
-    /// </summary>
-    public void EquipFromSlotAttachmentPairs(List<SlotAttachmentPair> pairs, bool saveState = true)
-    {
-        if (skeletonAnimation == null || skeletonAnimation.Skeleton == null || pairs == null) return;
-
-        // Lưu lại để tái tạo khi OnRebuild
-        if (saveState)
-        {
-            currentAppliedPairs = new List<SlotAttachmentPair>();
-            for (int i = 0; i < pairs.Count; i++)
-            {
-                currentAppliedPairs.Add(new SlotAttachmentPair
-                {
-                    isEnabled = pairs[i].isEnabled,
-                    slotName = pairs[i].slotName,
-                    attachmentName = pairs[i].attachmentName,
-                    skeletonDataAsset = pairs[i].skeletonDataAsset
-                });
-            }
-        }
-
-        var skeleton = skeletonAnimation.Skeleton;
-        var skeletonData = skeleton.Data;
-
-        // Tạo Skin tuỳ chỉnh mới
-        customSkin = new Skin("custom-mix");
-
-        // Gộp Default Skin vào trước
-        if (skeletonData.DefaultSkin != null)
-        {
-            customSkin.AddSkin(skeletonData.DefaultSkin);
-        }
-
-        // Tập hợp các Skin đã được thêm (tránh thêm trùng)
-        HashSet<string> addedSkinNames = new HashSet<string>();
-
-        for (int i = 0; i < pairs.Count; i++)
-        {
-            SlotAttachmentPair pair = pairs[i];
-            if (!pair.isEnabled || string.IsNullOrEmpty(pair.attachmentName)) continue;
-
-            // Tìm slot index
-            SlotData slotData = skeletonData.FindSlot(pair.slotName);
-            if (slotData == null) continue;
-            int slotIndex = slotData.Index;
-
-            // Quét TẤT CẢ các Skin để tìm Skin nào chứa attachment này ở slot này
-            for (int s = 0; s < skeletonData.Skins.Count; s++)
-            {
-                Skin skin = skeletonData.Skins.Items[s];
-                Attachment attachment = skin.GetAttachment(slotIndex, pair.attachmentName);
-
-                if (attachment != null)
-                {
-                    // Tìm thấy! Gộp toàn bộ Skin này vào (nếu chưa thêm)
-                    if (!addedSkinNames.Contains(skin.Name))
-                    {
-                        customSkin.AddSkin(skin);
-                        addedSkinNames.Add(skin.Name);
-                    }
-                    break;
-                }
-            }
-        }
-
-        // Đắp Skin lên nhân vật
-        skeleton.SetSkin(customSkin);
-        skeleton.SetSlotsToSetupPose(); // Lấy form mặc định
-
-        // QUAN TRỌNG: Spine SetSlotsToSetupPose chỉ bật những thứ có sẵn ở Setup Pose.
-        // Với những món đồ ta muốn BẬT nhưng mặc định nó TẮT ở Setup Pose, ta PHẢI gọi SetAttachment thủ công!
-        for (int i = 0; i < pairs.Count; i++)
-        {
-            SlotAttachmentPair pair = pairs[i];
-            if (!string.IsNullOrEmpty(pair.slotName))
-            {
-                if (pair.isEnabled && !string.IsNullOrEmpty(pair.attachmentName))
-                {
-                    // Ép bật món đồ này lên
-                    try 
-                    { 
-                        skeleton.SetAttachment(pair.slotName, pair.attachmentName); 
-                        if (!forcedAttachments.ContainsKey(pair.slotName)) forcedAttachmentKeys.Add(pair.slotName);
-                        forcedAttachments[pair.slotName] = pair.attachmentName;
-                    }
-                    catch (System.Exception) { }
-                }
-                else
-                {
-                    // Ép tắt nếu không tick
-                    try 
-                    { 
-                        skeleton.SetAttachment(pair.slotName, null); 
-                        if (!forcedAttachments.ContainsKey(pair.slotName)) forcedAttachmentKeys.Add(pair.slotName);
-                        forcedAttachments[pair.slotName] = null;
-                    }
-                    catch (System.Exception) { }
-                }
-            }
-        }
-
-        if (skeletonAnimation.AnimationState != null)
-        {
-            skeletonAnimation.AnimationState.Apply(skeleton);
-        }
-
-#if UNITY_EDITOR
-        // Đăng ký event thủ công vì script này không có [ExecuteInEditMode] nên OnEnable không chạy ở Editor
-        skeletonAnimation.OnRebuild -= OnSkeletonRebuild;
-        skeletonAnimation.OnRebuild += OnSkeletonRebuild;
-
-        if (!Application.isPlaying)
-        {
-            if (saveState)
-            {
-                UnityEditor.EditorUtility.SetDirty(this);
-                skeletonAnimation.LateUpdate();
-            }
-        }
-#endif
-    }
-
     // ===== API CŨ (Giữ lại để tương thích với SpineEmotionController, ToggleBoneSlot) =====
 
-    public void TurnSlotAttachment(string slotName, string attachmentName = null)
+    public void TurnSlotAttachment(string slotName, string attachmentName = null, string sourceSkinName = null)
     {
         try
         {
@@ -447,13 +672,21 @@ public class Character : Ply_GameUnit
                 {
                     int slotIndex = slot.Data.Index;
                     var attachment = skeletonAnimation.Skeleton.GetAttachment(slotIndex, attachmentName);
+                    if (attachment == null && customSkin != null)
+                    {
+                        // Skin hiện tại chưa có món đồ này -> nhặt nó từ Skin nguồn rồi đắp thêm vào
+                        if (MergeAttachmentIntoCustomSkin(skeletonAnimation.Skeleton.Data, sourceSkinName, slotIndex,
+                                attachmentName))
+                            attachment = skeletonAnimation.Skeleton.GetAttachment(slotIndex, attachmentName);
+                    }
+
                     if (attachment != null)
                     {
                         skeletonAnimation.Skeleton.SetAttachment(slotName, attachmentName);
                     }
                     else
                     {
-                        // Skin hiện tại không có món đồ này -> Bỏ qua, không báo lỗi
+                        // Không tìm thấy ở bất kỳ Skin nào -> Bỏ qua, không báo lỗi
                         return;
                     }
                 }
@@ -464,6 +697,9 @@ public class Character : Ply_GameUnit
                 forcedAttachmentKeys.Add(slotName);
             }
             forcedAttachments[slotName] = attachmentName;
+
+            if (string.IsNullOrEmpty(sourceSkinName)) forcedSourceSkins.Remove(slotName);
+            else forcedSourceSkins[slotName] = sourceSkinName;
 
             if (skeletonAnimation.AnimationState != null)
             {
@@ -484,7 +720,7 @@ public class Character : Ply_GameUnit
         for (int i = 0; i < slotAttachmentPairs.Count; i++)
         {
             SlotAttachmentPair pair = slotAttachmentPairs[i];
-            TurnSlotAttachment(pair.slotName, pair.attachmentName);
+            TurnSlotAttachment(pair.slotName, pair.attachmentName, pair.skinName);
         }
     }
 

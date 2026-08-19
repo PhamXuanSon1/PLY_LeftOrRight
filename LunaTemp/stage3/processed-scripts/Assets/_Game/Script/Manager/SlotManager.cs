@@ -71,6 +71,7 @@ public class SlotManager : MonoBehaviour
     {
         if (isFirstClick)
         {
+            AppLovinAnalytics.Track(ALEvent.CHALLENGE_STARTED);
             isFirstClick = false;
             if (objectToHideOnFirstClick != null)
             {

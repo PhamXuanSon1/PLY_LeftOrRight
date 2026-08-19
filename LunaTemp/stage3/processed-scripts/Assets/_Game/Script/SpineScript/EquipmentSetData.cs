@@ -20,4 +20,29 @@ public class EquipmentSetData : ScriptableObject
     [Tooltip("Danh sách tên các Skin sẽ được gộp (mix) lại để mặc cho nhân vật")]
     public List<string> skinNames = new List<string>();
 
+#if UNITY_EDITOR
+    [Title("Override Từng Slot")]
+    [InfoBox("Mỗi dòng = lấy 1 Skin Placeholder từ 1 Skin nguồn rồi đắp lên 1 slot.\n" +
+             "Bỏ tick = không dùng dòng đó.\n" +
+             "Cột 'Ảnh Thay Thế': ảnh dùng thay cho hình trong atlas Spine (cần bật Read/Write Enabled).\n" +
+             "LƯU Ý: nhiều placeholder trùng tên ở nhiều Skin nên BẮT BUỘC phải điền Skin Nguồn.")]
+    [TableList(ShowIndexLabels = true)]
+    [Searchable(FilterOptions = SearchFilterOptions.ValueToString | SearchFilterOptions.ISearchFilterableInterface)]
+#endif
+    [Tooltip("Đè/tắt từng slot lẻ trên nền các Skin ở trên")]
+    public List<SlotAttachmentPair> attachmentPairs = new List<SlotAttachmentPair>();
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        // Gán SkeletonDataAsset xuống từng dòng để dropdown Slot/Attachment hiển thị đúng
+        if (attachmentPairs == null) return;
+
+        for (int i = 0; i < attachmentPairs.Count; i++)
+        {
+            if (attachmentPairs[i] != null)
+                attachmentPairs[i].skeletonDataAsset = targetSkeletonDataAsset;
+        }
+    }
+#endif
 }

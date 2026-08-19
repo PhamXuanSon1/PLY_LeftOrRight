@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
 
     public void GotoStore()
     {
+        AppLovinAnalytics.Track(ALEvent.CTA_CLICKED);
         LifeCycle.GameEnded();
 
         Playable.InstallFullGame();
